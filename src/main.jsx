@@ -1,6 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./routes/App.jsx";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Root from "./routes/Root.jsx";
 import NotFound from "./routes/NotFound.jsx";
@@ -11,12 +10,17 @@ const router = createBrowserRouter([
     path: "/",
     element: <Root />,
     errorElement:<NotFound/>,
-    children:[{
-      path:"/FindRoute",
-      element: <FindRoute/>,
-      errorElement:<NotFound/>
-    }]
+    // children:[{
+    //   path:"/FindRoute",
+    //   element: <FindRoute/>,
+    //   errorElement:<NotFound/>
+    // }]
   },
+  {
+    path:"FindRoute",
+    element:<FindRoute/>,
+    // errorElement:<NotFound/>
+  }
   
 ]);
 

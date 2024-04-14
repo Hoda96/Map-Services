@@ -38,6 +38,9 @@ export default function FindRoute() {
   //  const [destinationLng, setDestinationLng] = useState(null);
   //  const [destinationLat, setDestinationLat] = useState(null);
 
+
+
+  
   function handlePoint(type) {
     if (markers[type]) {
       markers[type].remove();
@@ -208,7 +211,7 @@ export default function FindRoute() {
             )}
           </div> */}
         </div>
-        {/* <div ref={mapContainer} className="map-container" /> */}
+        <div ref={mapContainer} className="map-container" />
       </div>
 
   );
