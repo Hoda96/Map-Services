@@ -10,23 +10,26 @@ const router = createBrowserRouter([
     path: "/",
     element: <Root />,
     errorElement:<NotFound/>,
-    // children:[{
-    //   path:"/FindRoute",
-    //   element: <FindRoute/>,
-    //   errorElement:<NotFound/>
-    // }]
+    children:[{
+      path:"/FindRoute",
+      element: <FindRoute/>,
+      errorElement:<NotFound/>
+    }]
   },
-  {
-    path:"FindRoute",
-    element:<FindRoute/>,
-    // errorElement:<NotFound/>
-  }
+  // {
+  //   path:"FindRoute",
+  //   element:<FindRoute/>,
+  //   // errorElement:<NotFound/>
+  // }
   
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
+
     <RouterProvider router={router} />
+      
     {/* <App /> */}
+
   </React.StrictMode>
 );

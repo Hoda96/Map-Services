@@ -1,7 +1,9 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useContext } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "../App.css";
+import MapComponent from "../layouts/MapComponent";
+import MapContext from "../context/MapContext";
 
 
 const API_KEY = import.meta.env.VITE_API_KEY;
@@ -13,11 +15,10 @@ if (maplibregl.getRTLTextPluginStatus !== "loaded") {
 }
 
 export default function FindRoute() {
-  const mapContainer = useRef(null);
-  const mapRef = useRef(null);
-  const lng = 51.5;
-  const lat = 35.72;
-  const zoom = 12;
+
+
+  const mapRef = useContext(MapContext);
+console.log("mapRef in findroute com", mapRef)
 
   const [point, setPoint] = useState({ start: false, destination: false });
   const [coordinates, setCoordinates] = useState({
@@ -31,17 +32,12 @@ export default function FindRoute() {
     start: null,
     destination: null,
   });
-  //  const [startPoint, setStartPoint] = useState(false);
-  //  const [destinationPoint, setDestinationPoint] = useState(false);
-  //  const [startLng, setStartLng] = useState(null);
-  //  const [startLat, setStartLat] = useState(null);
-  //  const [destinationLng, setDestinationLng] = useState(null);
-  //  const [destinationLat, setDestinationLat] = useState(null);
-
-
 
   
   function handlePoint(type) {
+    console.log(' HHEEEEEEEEEEEEE LOOOOOOOOOOOOOOO')
+    console.log('mapRef.current', mapRef)
+
     if (markers[type]) {
       markers[type].remove();
     }
@@ -51,7 +47,7 @@ export default function FindRoute() {
       const marker = new maplibregl.Marker();
       console.log(e.lngLat);
       const coords = e.lngLat;
-      marker.setLngLat(coords).addTo(mapRef.current);
+      marker.setLngLat(coords).addTo(mapRef);
 
       // Save the marker in the state
       setMarkers((prevState) => ({
@@ -65,9 +61,9 @@ export default function FindRoute() {
         [`${type}Lat`]: coords.lat,
       }));
       setPoint((prev) => ({ ...prev, [type]: !prev[type] }));
-      mapRef.current.off("click", add_marker);
+      mapRef.off("click", add_marker);
     }
-    mapRef.current.on("click", add_marker);
+    mapRef.on("click", add_marker);
   }
 
   function handleFindRoute() {
@@ -83,9 +79,9 @@ export default function FindRoute() {
     }
 
     // Check if the route source already exists
-    if (mapRef.current.getSource("route")) {
+    if (mapRef.getSource("route")) {
       // Update the route source data with the new coordinates
-      mapRef.current.getSource("route").setData({
+      mapRef.getSource("route").setData({
         type: "Feature",
         properties: {},
         geometry: {
@@ -98,7 +94,7 @@ export default function FindRoute() {
       });
     } else {
       // If the route source does not exist, add it
-      mapRef.current.addSource("route", {
+      mapRef.addSource("route", {
         type: "geojson",
         data: {
           type: "Feature",
@@ -114,7 +110,7 @@ export default function FindRoute() {
       });
 
       // Add the route layer
-      mapRef.current.addLayer({
+      mapRef.addLayer({
         id: "route",
         type: "line",
         source: "route",
@@ -203,15 +199,8 @@ export default function FindRoute() {
               Find Route
             </button>
           </div>
-          {/* <div className="message">
-            {point[0] ? (
-              <p>Select starting point on map.</p>
-            ) : (
-              <p>Press Starting Point button.</p>
-            )}
-          </div> */}
         </div>
-        <div ref={mapContainer} className="map-container" />
+       <MapComponent/>
       </div>
 
   );
