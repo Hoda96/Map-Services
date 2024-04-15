@@ -1,12 +1,19 @@
+import maplibregl from "maplibre-gl";
 import React, {
   useRef
 } from "react";
-
 import { Outlet } from "react-router-dom";
-import Navbar from "../layouts/Navbar";
-import MapComponent from "../layouts/MapComponent";
 import MapContext from "../context/MapContext";
-import FindRoute from "./FindRoute";
+import MapComponent from "../layouts/MapComponent";
+import Navbar from "../layouts/Navbar";
+
+import "maplibre-gl/dist/maplibre-gl.css";
+
+if (maplibregl.getRTLTextPluginStatus !== "loaded") {
+  maplibregl.setRTLTextPlugin(
+    "https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.0/mapbox-gl-rtl-text.js"
+  );
+}
 
 function Root() {
   const mapRef = useRef(null);
@@ -15,11 +22,6 @@ function Root() {
     <MapContext.Provider value={mapRef}>
       <div className="container">
         <Outlet />
-
-        {/* <div
-        ref={mapContainer}
-        className="map-container"
-      /> */}
         <MapComponent />
         <Navbar />
       </div>

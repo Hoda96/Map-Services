@@ -5,20 +5,12 @@ import "../App.css";
 import MapComponent from "../layouts/MapComponent";
 import MapContext from "../context/MapContext";
 
-
 const API_KEY = import.meta.env.VITE_API_KEY;
 
-if (maplibregl.getRTLTextPluginStatus !== "loaded") {
-  maplibregl.setRTLTextPlugin(
-    "https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.0/mapbox-gl-rtl-text.js"
-  );
-}
 
 export default function FindRoute() {
-
-
   const mapRef = useContext(MapContext);
-console.log("mapRef in findroute com", mapRef)
+  // console.log("mapRef in findroute com", mapRef);
 
   const [point, setPoint] = useState({ start: false, destination: false });
   const [coordinates, setCoordinates] = useState({
@@ -33,21 +25,23 @@ console.log("mapRef in findroute com", mapRef)
     destination: null,
   });
 
-  
   function handlePoint(type) {
-    console.log(' HHEEEEEEEEEEEEE LOOOOOOOOOOOOOOO')
-    console.log('mapRef.current', mapRef)
+  
+      if (markers[type]) {
+        console.log("type", type)
+        markers[type].remove();
+      }
+    
+    setPoint(
+      (prev) => ({ ...prev, [type]: !prev[type] })
 
-    if (markers[type]) {
-      markers[type].remove();
-    }
-
-    setPoint((prev) => ({ ...prev, [type]: !prev[type] }));
+    );
     function add_marker(e) {
+      console.log("e",e);
       const marker = new maplibregl.Marker();
-      console.log(e.lngLat);
+      console.log("e.lngLat",e.lngLat);
       const coords = e.lngLat;
-      marker.setLngLat(coords).addTo(mapRef);
+      marker.setLngLat(coords).addTo(mapRef.current);
 
       // Save the marker in the state
       setMarkers((prevState) => ({
@@ -61,9 +55,9 @@ console.log("mapRef in findroute com", mapRef)
         [`${type}Lat`]: coords.lat,
       }));
       setPoint((prev) => ({ ...prev, [type]: !prev[type] }));
-      mapRef.off("click", add_marker);
+      mapRef.current.off("click", add_marker);
     }
-    mapRef.on("click", add_marker);
+    mapRef.current.on("click", add_marker);
   }
 
   function handleFindRoute() {
@@ -79,9 +73,9 @@ console.log("mapRef in findroute com", mapRef)
     }
 
     // Check if the route source already exists
-    if (mapRef.getSource("route")) {
+    if (mapRef.current.getSource("route")) {
       // Update the route source data with the new coordinates
-      mapRef.getSource("route").setData({
+      mapRef.current.getSource("route").setData({
         type: "Feature",
         properties: {},
         geometry: {
@@ -94,7 +88,7 @@ console.log("mapRef in findroute com", mapRef)
       });
     } else {
       // If the route source does not exist, add it
-      mapRef.addSource("route", {
+      mapRef.current.addSource("route", {
         type: "geojson",
         data: {
           type: "Feature",
@@ -110,7 +104,7 @@ console.log("mapRef in findroute com", mapRef)
       });
 
       // Add the route layer
-      mapRef.addLayer({
+      mapRef.current.addLayer({
         id: "route",
         type: "line",
         source: "route",
@@ -143,65 +137,46 @@ console.log("mapRef in findroute com", mapRef)
       if (!req.ok) throw new Error(" Fetch not completed :(");
 
       const route = await req.json();
-      console.log("route", route);
+      console.log("rodfsdrgdfgfgute", route);
     } catch (error) {
       console.log("Error:", error);
     }
+    getRoute();
   };
 
-  // useEffect(() => {
-  //   if (mapRef.current) return;
-
-  //   mapRef.current = new maplibregl.Map({
-  //     container: mapContainer.current,
-  //     style: "https://map.ir/vector/styles/main/mapir-xyz-style.json", // stylesheet location
-  //     center: [lng, lat], // starting position [lng, lat]
-  //     zoom: zoom, // starting zoom
-  //     transformRequest: (url) => {
-  //       return {
-  //         url,
-  //         headers: {
-  //           "x-api-key": API_KEY, //Mapir api key
-  //         },
-  //       };
-  //     },
-  //   });
-  // }, []);
+// console.log("getRoue", getRoute());
 
   return (
- 
-      <div className="container">
-        <div className="sidebar">
-          <div className="groupBtn">
-            <button
-              className="btn"
-              id="point"
-              onClick={() => handlePoint("start")}
-              style={{
-                backgroundColor: point.start ? "#ccc1c0" : "",
-                color: point.start ? "#f5f5f5" : "",
-              }}
-            >
-              Starting Point
-            </button>
-            <button
-              className="btn"
-              id="point"
-              onClick={() => handlePoint("destination")}
-              style={{
-                backgroundColor: point.destination ? "#ccc1c0" : "",
-                color: point.destination ? "#f5f5f5" : "",
-              }}
-            >
-              Destinaion Point
-            </button>
-            <button className="findBtn" onClick={handleFindRoute}>
-              Find Route
-            </button>
-          </div>
+    <div className="container">
+      <div className="sidebar">
+        <div className="groupBtn">
+          <button
+            className="btn"
+            id="point"
+            onClick={() => handlePoint("start")}
+            style={{
+              backgroundColor: point.start ? "#ccc1c0" : "",
+              color: point.start ? "#f5f5f5" : "",
+            }}
+          >
+            Starting Point
+          </button>
+          <button
+            className="btn"
+            id="point"
+            onClick={() => handlePoint("destination")}
+            style={{
+              backgroundColor: point.destination ? "#ccc1c0" : "",
+              color: point.destination ? "#f5f5f5" : "",
+            }}
+          >
+            Destinaion Point
+          </button>
+          <button className="findBtn" onClick={handleFindRoute}>
+            Find Route
+          </button>
         </div>
-       <MapComponent/>
       </div>
-
+    </div>
   );
 }
