@@ -71,6 +71,8 @@ export default function FindRoute() {
       console.log("Start or destination coordinates are not set");
       return;
     }
+    
+    getRoute();
 
     // Check if the route source already exists
     if (mapRef.current.getSource("route")) {
@@ -93,15 +95,18 @@ export default function FindRoute() {
         data: {
           type: "Feature",
           properties: {},
-          geometry: {
-            type: "LineString",
-            coordinates: [
-              [coordinates.startLng, coordinates.startLat], // Origin coordinates
-              [coordinates.destinationLng, coordinates.destinationLat], // Destination coordinates
-            ],
-          },
+          geometry:geometry,
+          // geometry: {
+
+          // type: "LineString",
+          // coordinates: [
+          //   [coordinates.startLng, coordinates.startLat], // Origin coordinates
+          //   [coordinates.destinationLng, coordinates.destinationLat], // Destination coordinates
+          // ],
+          // }
         },
       });
+
 
       // Add the route layer
       mapRef.current.addLayer({
@@ -122,8 +127,8 @@ export default function FindRoute() {
 
   const getRoute = async () => {
     try {
-      const req = await fetch(
-        `https://map.ir/routes/foot/v1/driving/${startLng},${startLat};${destinationLng},${destinationLat}?alternatives=true&?steps=true&geometries=geojson`,
+      const res = await fetch(
+        `https://map.ir/routes/foot/v1/driving/${coordinates.startLng},${coordinates.startLat};${coordinates.destinationLng},${coordinates.destinationLat}?alternatives=true&steps=true&geometries=geojson`,
         // `https://map.ir/routes/route/v1/driving/51.421047,35.732936;51.422185,35.731821`,
         // `https://map.ir/routes/route/v1/driving/51.421047,35.732936;51.422185,35.731821?alternatives=true&steps=true&geometries=geojson`,
         {
@@ -134,17 +139,20 @@ export default function FindRoute() {
         }
       );
 
-      if (!req.ok) throw new Error(" Fetch not completed :(");
+      if (!res.ok) throw new Error(" Fetch not completed :(");
 
-      const route = await req.json();
-      console.log("rodfsdrgdfgfgute", route);
+      const data = await res.json();
+      
+      const geometry = data.routes[0].geometry;
+      console.log("geometry",geometry)
+      return geometry;
     } catch (error) {
-      console.log("Error:", error);
+      return null
     }
-    getRoute();
+
   };
 
-// console.log("getRoue", getRoute());
+
 
   return (
     <div className="container">
