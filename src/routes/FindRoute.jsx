@@ -9,7 +9,6 @@ const API_KEY = import.meta.env.VITE_API_KEY;
 
 export default function FindRoute() {
   const mapRef = useContext(MapContext);
-  // console.log("mapRef in findroute com", mapRef);
 
   const [point, setPoint] = useState({ start: false, destination: false });
   const [coordinates, setCoordinates] = useState({
@@ -24,7 +23,6 @@ export default function FindRoute() {
     destination: null,
   });
 
-  // const [geometry, setGeometry] = useState(null);
 
   function handlePoint(type) {
     if (markers[type]) {
@@ -57,21 +55,57 @@ export default function FindRoute() {
     mapRef.current.on("click", add_marker);
   }
 
-  function handleFindRoute() {
-    getRoute();
-
+  async function  handleFindRoute() {
+    
+    
     const allCoordsAreNotSet =
-      coordinates.startLng === null ||
-      coordinates.startLat === null ||
-      coordinates.destinationLng === null ||
-      coordinates.destinationLat === null;
-
+    coordinates.startLng === null ||
+    coordinates.startLat === null ||
+    coordinates.destinationLng === null ||
+    coordinates.destinationLat === null;
+    
     if (allCoordsAreNotSet) {
       console.log("Start or destination coordinates are not set");
       return;
     }
+    
+    const geometry= await getRoute();
+    if (!geometry) {
+      console.log("Geometry is null");
+      return;
+    };
 
- 
+    const routeSource = mapRef.current.getSource("route");
+      // Check if the route source already exists
+      if (routeSource) {
+        // Update the route source data with the new coordinates
+        routeSource.setData({
+          type: "Feature",
+          properties: {},
+          geometry: geometry,
+  
+        });
+      } else {
+        // If the route source does not exist, add it
+        mapRef.current.addSource("route", {
+          type: "geojson",
+          data: {
+            type: "Feature",
+            geometry: geometry,
+          },
+        });
+
+        // Add the route layer
+        mapRef.current.addLayer({
+          id: "route",
+          type: "line",
+          source: "route",
+          paint: {
+            "line-color": "#eb4034", // Color of the route
+            "line-width": 4, // Width of the route
+          },
+        });
+      }
   }
 
   const getRoute = async () => {
@@ -93,58 +127,7 @@ export default function FindRoute() {
       const data = await res.json();
 
       const geometry = data.routes[0].geometry;
-      
 
-        // Check if the route source already exists
-   if (mapRef.current.getSource("route")) {
-    // Update the route source data with the new coordinates
-    mapRef.current.getSource("route").setData({
-      type: "Feature",
-      properties: {},
-      // geometry: geometry,
-      geometry: {
-        type: "LineString",
-        coordinates: [
-          [coordinates.startLng, coordinates.startLat], // Origin coordinates
-          [coordinates.destinationLng, coordinates.destinationLat], // Destination coordinates
-        ],
-      },
-    });
-  } else {
-    // If the route source does not exist, add it
-    mapRef.current.addSource("route", {
-      type: "geojson",
-      data: {
-        type: "Feature",
-        // properties: {},
-        geometry:geometry,
-        // geometry: {
-
-        // type: "LineString",
-        // coordinates: [
-        //   [coordinates.startLng, coordinates.startLat], // Origin coordinates
-        //   [coordinates.destinationLng, coordinates.destinationLat], // Destination coordinates
-        // ],
-        // }
-      },
-    });
-
-    // Add the route layer
-    mapRef.current.addLayer({
-      id: "route",
-      type: "line",
-      source: "route",
-      // layout: {
-      //   "line-join": "round",
-      //   "line-cap": "round",
-      // },
-      paint: {
-        "line-color": "#325ca8", // Color of the route
-        "line-width": 8, // Width of the route
-      },
-    });
-  }
- 
 
       console.log("geometryyyy", geometry);
       // setGeometry(geometry);
@@ -152,7 +135,6 @@ export default function FindRoute() {
     } catch (error) {
       return null;
     }
-  
   };
 
   return (
