@@ -7,7 +7,6 @@ import MapContext from "../context/MapContext";
 
 const API_KEY = import.meta.env.VITE_API_KEY;
 
-
 export default function FindRoute() {
   const mapRef = useContext(MapContext);
   // console.log("mapRef in findroute com", mapRef);
@@ -25,21 +24,19 @@ export default function FindRoute() {
     destination: null,
   });
 
-  function handlePoint(type) {
-  
-      if (markers[type]) {
-        console.log("type", type)
-        markers[type].remove();
-      }
-    
-    setPoint(
-      (prev) => ({ ...prev, [type]: !prev[type] })
+  // const [geometry, setGeometry] = useState(null);
 
-    );
+  function handlePoint(type) {
+    if (markers[type]) {
+      console.log("type", type);
+      markers[type].remove();
+    }
+
+    setPoint((prev) => ({ ...prev, [type]: !prev[type] }));
     function add_marker(e) {
-      console.log("e",e);
+      console.log("e", e);
       const marker = new maplibregl.Marker();
-      console.log("e.lngLat",e.lngLat);
+      console.log("e.lngLat", e.lngLat);
       const coords = e.lngLat;
       marker.setLngLat(coords).addTo(mapRef.current);
 
@@ -61,6 +58,8 @@ export default function FindRoute() {
   }
 
   function handleFindRoute() {
+    getRoute();
+
     const allCoordsAreNotSet =
       coordinates.startLng === null ||
       coordinates.startLat === null ||
@@ -71,58 +70,8 @@ export default function FindRoute() {
       console.log("Start or destination coordinates are not set");
       return;
     }
-    
-    getRoute();
 
-    // Check if the route source already exists
-    if (mapRef.current.getSource("route")) {
-      // Update the route source data with the new coordinates
-      mapRef.current.getSource("route").setData({
-        type: "Feature",
-        properties: {},
-        geometry: {
-          type: "LineString",
-          coordinates: [
-            [coordinates.startLng, coordinates.startLat], // Origin coordinates
-            [coordinates.destinationLng, coordinates.destinationLat], // Destination coordinates
-          ],
-        },
-      });
-    } else {
-      // If the route source does not exist, add it
-      mapRef.current.addSource("route", {
-        type: "geojson",
-        data: {
-          type: "Feature",
-          properties: {},
-          geometry:geometry,
-          // geometry: {
-
-          // type: "LineString",
-          // coordinates: [
-          //   [coordinates.startLng, coordinates.startLat], // Origin coordinates
-          //   [coordinates.destinationLng, coordinates.destinationLat], // Destination coordinates
-          // ],
-          // }
-        },
-      });
-
-
-      // Add the route layer
-      mapRef.current.addLayer({
-        id: "route",
-        type: "line",
-        source: "route",
-        layout: {
-          "line-join": "round",
-          "line-cap": "round",
-        },
-        paint: {
-          "line-color": "#325ca8", // Color of the route
-          "line-width": 8, // Width of the route
-        },
-      });
-    }
+ 
   }
 
   const getRoute = async () => {
@@ -142,17 +91,69 @@ export default function FindRoute() {
       if (!res.ok) throw new Error(" Fetch not completed :(");
 
       const data = await res.json();
-      
+
       const geometry = data.routes[0].geometry;
-      console.log("geometry",geometry)
+      
+
+        // Check if the route source already exists
+   if (mapRef.current.getSource("route")) {
+    // Update the route source data with the new coordinates
+    mapRef.current.getSource("route").setData({
+      type: "Feature",
+      properties: {},
+      // geometry: geometry,
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [coordinates.startLng, coordinates.startLat], // Origin coordinates
+          [coordinates.destinationLng, coordinates.destinationLat], // Destination coordinates
+        ],
+      },
+    });
+  } else {
+    // If the route source does not exist, add it
+    mapRef.current.addSource("route", {
+      type: "geojson",
+      data: {
+        type: "Feature",
+        // properties: {},
+        geometry:geometry,
+        // geometry: {
+
+        // type: "LineString",
+        // coordinates: [
+        //   [coordinates.startLng, coordinates.startLat], // Origin coordinates
+        //   [coordinates.destinationLng, coordinates.destinationLat], // Destination coordinates
+        // ],
+        // }
+      },
+    });
+
+    // Add the route layer
+    mapRef.current.addLayer({
+      id: "route",
+      type: "line",
+      source: "route",
+      // layout: {
+      //   "line-join": "round",
+      //   "line-cap": "round",
+      // },
+      paint: {
+        "line-color": "#325ca8", // Color of the route
+        "line-width": 8, // Width of the route
+      },
+    });
+  }
+ 
+
+      console.log("geometryyyy", geometry);
+      // setGeometry(geometry);
       return geometry;
     } catch (error) {
-      return null
+      return null;
     }
-
+  
   };
-
-
 
   return (
     <div className="container">
