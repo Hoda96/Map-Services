@@ -2,9 +2,9 @@ import React, { useContext, useEffect, useState } from "react";
 import MapContext from "../context/MapContext";
 
 const API_KEY = import.meta.env.VITE_API_KEY;
-// console.log(API_KEY);
+
 export default function Geofence() {
-  //   const mapRef = useContext(MapContext);
+  const mapRef = useContext(MapContext);
 
   const [selectedFile, setSelectedFile] = useState();
   const [fileContent, setFileContent] = useState();
@@ -75,6 +75,7 @@ export default function Geofence() {
         const data = await response.json();
         console.log("data:", data);
         setStages(data);
+
         console.log("stages state", stages);
       } catch (error) {
         console.log("Failed to get stages", error);
@@ -82,24 +83,109 @@ export default function Geofence() {
     };
     // Call the async function
     fetchStages();
+    mapRef.current.addSource("stage", {
+      type: "geojson",
+      data: {
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              coordinates: [
+                [
+                  [51.404460425546716, 35.74047460051801],
+                  [51.3799245702744, 35.73431904610969],
+                  [51.40988458850961, 35.709283211445694],
+                  [51.42330683516079, 35.72674742302611],
+                  [51.42663685406157, 35.74104946384466],
+                  [51.404460425546716, 35.74047460051801],
+                ],
+              ],
+              type: "Polygon",
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              coordinates: [
+                [
+                  [51.401234799345815, 35.69826694278217],
+                  [51.40057022054742, 35.68864772571267],
+                  [51.419381349542306, 35.68751061718493],
+                  [51.421420568591486, 35.69798176043251],
+                  [51.401234799345815, 35.69826694278217],
+                ],
+              ],
+              type: "Polygon",
+            },
+          },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              coordinates: [
+                [
+                  [51.33343572995875, 35.72843408428626],
+                  [51.30861491012362, 35.728434467551295],
+                  [51.30875814944605, 35.70636796480834],
+                  [51.33343572995875, 35.72843408428626],
+                ],
+              ],
+              type: "Polygon",
+            },
+          },
+        ],
+      },
+    });
+
+    mapRef.current.addLayer({
+      id: "stage",
+      type: "fill",
+      source: "stage",
+      paint: {
+        "fill-color": "#0080ff", // blue color fill
+        "fill-opacity": 0.5,
+      },
+    });
+    // Add a black outline around the polygon.
+    mapRef.current.addLayer({
+      id: "outline",
+      type: "line",
+      source: "stage",
+      layout: {},
+      paint: {
+        "line-color": "#000",
+        "line-width": 1,
+      },
+    });
   }, []);
 
   return (
     <div className="container">
       <div className="sidebar">
-        <h2>Uploaded Stages</h2>
-        <p>
-          You have uploaded {stages && stages["odata.count"]} stages so far.
-        </p>
-        <div className="uploadBtn">
-          <input type="file" onChange={handleFileChange} className="" />
-          <button onClick={handleUpload} className="btn">
-            Upload GeoJSON
-          </button>
+        <div className="uploadStage">
+          <h2>Uploaded Stages</h2>
+          <p>
+            You have uploaded {stages && stages["odata.count"]} stages so far.
+          </p>
+          <div className="uploadBtn">
+            <input type="file" onChange={handleFileChange} className="" />
+            <button onClick={handleUpload} className="btn">
+              Upload GeoJSON
+            </button>
+          </div>
+          <div className="divider"></div>
+          <div className="groupBtn">
+            <button className="btn">Delete Stage</button>
+          </div>
         </div>
-        <div className="divider"></div>
-        <div className="groupBtn">
-          <button className="btn">Delete Stage</button>
+        <div className="addCoords">
+          <p>
+            Select a point on the map or insert the coordinates to Verify its
+            Location.
+          </p>
         </div>
       </div>
     </div>
