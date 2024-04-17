@@ -38,6 +38,7 @@ body {
   flex-direction: column;
   justify-content: space-between;
   gap: 1.5rem;
+  align-items: center;
 }
 .btn,
 .findBtn {
@@ -88,9 +89,10 @@ body {
 text-shadow: #f1f1f1;
   color: #3e3e3e;
 }
-.hero-h1{
-  font-size: 3rem;
+.title{
+  font-size: 1rem;
 font-weight: 700;
+text-align: center;
 }
 .hero-p{
   width: 70%;
@@ -164,4 +166,7 @@ font-weight: 500;
   position: absolute;
   top: 20px;
   right: 370px;
+}
+input.uploadBtn{
+text-align: center;
 }
