@@ -158,5 +158,10 @@ font-weight: 500;
 }.item-2{
   position: absolute;
   top: 20px;
-  right: 220px;
+  right: 210px;
+}
+.item-3{
+  position: absolute;
+  top: 20px;
+  right: 370px;
 }

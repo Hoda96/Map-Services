@@ -4,6 +4,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Root from "./routes/Root.jsx";
 import NotFound from "./routes/NotFound.jsx";
 import FindRoute from "./routes/FindRoute.jsx";
+import Geofence from "./routes/Geofence.jsx";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,11 @@ const router = createBrowserRouter([
         element: <FindRoute />,
         errorElement: <NotFound />,
       },
+      {
+        path:"/Geofence",
+        element: <Geofence/>,
+        errorElement:<NotFound/>
+      }
     ],
   },
 ]);

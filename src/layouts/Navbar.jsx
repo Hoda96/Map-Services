@@ -13,6 +13,7 @@ export default function Navbar({isClicked}) {
       
       >Find Route</Link>
       <Link className="navbar-item item-2" to={"NotFound"}>404</Link>
+      <Link className="navbar-item item-3" to={"Geofence"}>Geofence</Link>
     </nav>
   );
 }
