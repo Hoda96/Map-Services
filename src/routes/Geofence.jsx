@@ -5,6 +5,9 @@ export default function Geofence() {
   const mapRef = useContext(MapContext);
 
   const [selectedFile, setSelectedFile] = useState();
+  const [geojson, setGeojson] = useState({});
+  console.log("isGeojsonAvailable", selectedFile);
+  console.log("show geojson", geojson);
 
   const handleFileChange = (event) => {
     console.log("file uploaded:", event.target.files);
@@ -13,25 +16,25 @@ export default function Geofence() {
 
   const handleUpload = () => {
     if (!selectedFile) {
-      console.log("Please select a file first");
+      alert("Please select a file first");
       return;
     }
     // Create a new FileReader object
     let reader = new FileReader();
     console.log("reader:", reader);
 
-    // reader.onprogress = ()=> alert("file is prossesing")
     // Setup the callback event to run when file reading is complete
     reader.onloadend = (e) => {
       console.log("file", e.target.result);
-      const geojson = e.target.result;
-      return geojson;
+      //   const geojson = e.target.result;
+      //   return geojson;
+      setGeojson(() => e.target.result);
     };
     // Read the file's content
     reader.readAsText(selectedFile);
 
     // Here you can add the code to upload 'selectedFile' to a server
-    console.log(`File ${selectedFile.name} is ready to be uploaded.`);
+    // alert(`File ${selectedFile.name} is ready to be uploaded.`);
   };
 
   return (
