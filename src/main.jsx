@@ -18,10 +18,10 @@ const router = createBrowserRouter([
         errorElement: <NotFound />,
       },
       {
-        path:"/Geofence",
-        element: <Geofence/>,
-        errorElement:<NotFound/>
-      }
+        path: "/Geofence",
+        element: <Geofence />,
+        errorElement: <NotFound />,
+      },
     ],
   },
 ]);
