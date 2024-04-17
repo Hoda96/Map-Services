@@ -17,13 +17,15 @@ body {
   flex-direction: row;
   justify-content: space-between;
   gap:0;
+  text-align: center;
+
 }
 .sidebar {
   /* height: auto;
   width: 100%; */
   background-color: rgb(2, 17, 83);
   color: #f1f1f1;
-  padding: 2rem 4rem;
+  padding: 2rem;
   transition:all 2s ease-in-out;
   z-index: 10;
 }
@@ -92,8 +94,8 @@ text-shadow: #f1f1f1;
 .title{
   font-size: 1rem;
 font-weight: 700;
-text-align: center;
 }
+
 .hero-p{
   width: 70%;
   margin: 0 auto;;
@@ -167,6 +169,18 @@ font-weight: 500;
   top: 20px;
   right: 370px;
 }
-input.uploadBtn{
-text-align: center;
+.uploadBtn{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 2rem 0;
+}
+input[type="file"]{
+  width: 190px;
+}
+.divider{
+  border: 1px solid #f2f2f2;
+  opacity: 0.3;
+  margin: 2rem 0;
 }

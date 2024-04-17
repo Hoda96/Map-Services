@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import MapContext from "../context/MapContext";
 
 const API_KEY = import.meta.env.VITE_API_KEY;
@@ -8,6 +8,7 @@ export default function Geofence() {
 
   const [selectedFile, setSelectedFile] = useState();
   const [fileContent, setFileContent] = useState();
+  const [stages, setStages] = useState({});
   //   console.log("isGeojsonAvailable", selectedFile);
   //   console.log("show geojson", fileContent);
 
@@ -59,19 +60,46 @@ export default function Geofence() {
     reader.readAsText(selectedFile);
   };
 
+  useEffect(() => {
+    // Make a GET request to the API
+    const fetchStages = async () => {
+      try {
+        const response = await fetch("https://map.ir/geofence/stages", {
+          headers: {
+            "x-api-key": `${API_KEY}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log("data:", data);
+        setStages(data);
+        console.log("stages state", stages);
+      } catch (error) {
+        console.log("Failed to get stages", error);
+      }
+    };
+    // Call the async function
+    fetchStages();
+  }, []);
+
   return (
     <div className="container">
       <div className="sidebar">
-        <div className="groupBtn">
-          <label className="title">Upload geojson file</label>
-          <input
-            type="file"
-            onChange={handleFileChange}
-            className="uploadBtn"
-          />
+        <h2>Uploaded Stages</h2>
+        <p>
+          You have uploaded {stages && stages["odata.count"]} stages so far.
+        </p>
+        <div className="uploadBtn">
+          <input type="file" onChange={handleFileChange} className="" />
           <button onClick={handleUpload} className="btn">
-            Upload
+            Upload GeoJSON
           </button>
+        </div>
+        <div className="divider"></div>
+        <div className="groupBtn">
+          <button className="btn">Delete Stage</button>
         </div>
       </div>
     </div>
