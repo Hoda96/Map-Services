@@ -1,82 +1,88 @@
 {
-    "root": true,
-    "extends": ["airbnb-base", "plugin:eslint-plugin/recommended"],
-    "plugins": ["eslint-plugin"],
-    "env": {
-       "es6": true,
-       "node": true
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "plugins": [
+    "babel",
+    "react",
+    "react-hooks",
+    "react-redux",
+    "redux-saga",
+    "no-async-without-await",
+    "css-modules",
+    "filenames",
+    "simple-import-sort"
+  ],
+  "extends": [
+    "react-app",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react-redux/recommended",
+    "plugin:redux-saga/recommended",
+    "plugin:css-modules/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
     },
-    "parserOptions": {
-      "ecmaVersion": 6,
-      "ecmaFeatures": {
-        "jsx": true
-      },
-      "sourceType": "script",
-    },
-    "ignorePatterns": [
-      "coverage/",
-      ".nyc_output/",
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "rules": {
+    "strict": ["error", "safe"],
+    "no-debugger": "error",
+    "brace-style": [ "error", "1tbs", { "allowSingleLine": true  } ],
+    "no-trailing-spaces": "error",
+    "keyword-spacing": "error",
+    "space-before-function-paren": ["error", "never"],
+    "spaced-comment": ["error", "always"],
+    "vars-on-top": "error",
+    "no-undef": "error",
+    "no-undefined": "warn",
+    "comma-dangle": ["error", "never"],
+    "quotes": ["error", "single"],
+    "semi": ["error", "always"],
+    "guard-for-in": "error",
+    "no-eval": "error",
+    "no-with": "error",
+    "valid-typeof": "error",
+    "no-unused-vars": "error",
+    "no-continue": "warn",
+    "no-extra-semi": "warn",
+    "no-unreachable": "warn",
+    "no-unused-expressions": "warn",
+    "max-len": ["warn", 80, 4],
+    "react/prefer-es6-class": "warn",
+    "react/jsx-boolean-value": "warn",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "@typescript-eslint/indent": ["error", 2],
+    "@typescript-eslint/no-explicit-any": "off",
+    "react/prop-types": "off",
+    "react-redux/mapDispatchToProps-returns-object": "off",
+    "react-redux/prefer-separate-component-file": "off",
+    "@typescript-eslint/explicit-function-return-type": [ "warn", { "allowExpressions": true } ],
+    "no-async-without-await/no-async-without-await": "warn",
+    "css-modules/no-undef-class": "off",
+    "filenames/match-regex": [
+      "error",
+      "^[a-zA-Z]+\\.*\\b(typescript|module|locale|validate|test|action|api|reducer|saga)?\\b$",
+      true
     ],
-    "rules": {
-        "comma-dangle": [2, "always-multiline"],
-        "object-shorthand": [2, "always", {
-          "ignoreConstructors": false,
-          "avoidQuotes": false, // this is the override vs airbnb
-        }],
-        "max-len": [2, 120, {
-          "ignoreStrings": true,
-          "ignoreTemplateLiterals": true,
-          "ignoreComments": true,
-        }],
-        "consistent-return": 0,
-
-        "prefer-destructuring": [2, { "array": false, "object": false }, { "enforceForRenamedProperties": false }],
-        "prefer-object-spread": 0, // until node 8 is required
-        "prefer-rest-params": 0, // until node 6 is required
-        "prefer-spread": 0, // until node 6 is required
-        "function-call-argument-newline": 1, // TODO: enable
-        "function-paren-newline": 0,
-        "no-plusplus": [2, {"allowForLoopAfterthoughts": true}],
-        "no-param-reassign": 1,
-        "no-restricted-syntax": [2, {
-            "selector": "ObjectPattern",
-            "message": "Object destructuring is not compatible with Node v4"
-        }],
-        "strict": [2, "safe"],
-        "valid-jsdoc": [2, {
-          "requireReturn": false,
-          "requireParamDescription": false,
-          "requireReturnDescription": false,
-        }],
-
-        "eslint-plugin/consistent-output": 0,
-        "eslint-plugin/require-meta-docs-description": [2, { "pattern": "^(Enforce|Require|Disallow)" }],
-        "eslint-plugin/require-meta-schema": 0,
-        "eslint-plugin/require-meta-type": 0
-    },
-    "overrides": [
-      {
-        "files": "tests/**",
-        "rules": {
-          "no-template-curly-in-string": 1,
-        },
-      },
-      {
-        "files": "markdown.config.js",
-        "rules": {
-          "no-console": 0,
-        },
-      },
-      {
-        "files": ".github/workflows/*.js",
-        "parserOptions": {
-          "ecmaVersion": 2019,
-        },
-        "rules": {
-          "camelcase": 0,
-          "no-console": 0,
-          "no-restricted-syntax": 0,
-        },
-      },
-    ],
+    "filenames/match-exported": "off",
+    "filenames/no-index": "error",
+    "simple-import-sort/sort": "error"
+  }
 }

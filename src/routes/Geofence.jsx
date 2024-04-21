@@ -3,14 +3,18 @@ import MapContext from "../context/MapContext";
 
 const API_KEY = import.meta.env.VITE_API_KEY;
 
+// const stage = uploadStages({})
+// if (stage) {
+//   fetchAndSetStages()
+// }
+
 export default function Geofence() {
   const mapRef = useContext(MapContext);
 
   const [selectedFile, setSelectedFile] = useState();
   const [fileContent, setFileContent] = useState();
   const [stages, setStages] = useState({});
-  //   console.log("isGeojsonAvailable", selectedFile);
-  //   console.log("show geojson", fileContent);
+  const [processedData, setProcessedData] = useState([]);
 
   const handleFileChange = (event) => {
     // console.log("file uploaded:", event.target.files);
@@ -25,6 +29,7 @@ export default function Geofence() {
 
     // Create a new FileReader object
     let reader = new FileReader();
+
     // Setup the callback event to run when file reading is complete
     reader.onloadend = async (e) => {
       // Set the file content to the state
@@ -50,6 +55,8 @@ export default function Geofence() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        // setStages(...stages, data.value);
+        // fetchAndSetStages();
         console.log("File uploaded successfully:", data);
       } catch (error) {
         console.error("Failed to upload file:", error);
@@ -74,8 +81,20 @@ export default function Geofence() {
         }
         const data = await response.json();
         console.log("data:", data);
+
         setStages(data);
 
+        // // Extract boundary values to display polygons on map
+        // const geometryValue = data.value.map((item) => item.boundary);
+        // console.log("geometryValue", typeof geometryValue);
+
+        // const geojsonBoundaries = geometryValue.map((boundary) => ({
+        //   type: "Polygon",
+        //   coordinates: boundary,
+        //   properties: {},
+        // }));
+
+        console.log("final geojson", geojsonBoundaries);
         console.log("stages state", stages);
       } catch (error) {
         console.log("Failed to get stages", error);
@@ -83,84 +102,130 @@ export default function Geofence() {
     };
     // Call the async function
     fetchStages();
-    mapRef.current.addSource("stage", {
-      type: "geojson",
-      data: {
-        type: "FeatureCollection",
-        features: [
-          {
-            type: "Feature",
-            properties: {},
-            geometry: {
-              coordinates: [
-                [
-                  [51.404460425546716, 35.74047460051801],
-                  [51.3799245702744, 35.73431904610969],
-                  [51.40988458850961, 35.709283211445694],
-                  [51.42330683516079, 35.72674742302611],
-                  [51.42663685406157, 35.74104946384466],
-                  [51.404460425546716, 35.74047460051801],
-                ],
-              ],
-              type: "Polygon",
-            },
-          },
-          {
-            type: "Feature",
-            properties: {},
-            geometry: {
-              coordinates: [
-                [
-                  [51.401234799345815, 35.69826694278217],
-                  [51.40057022054742, 35.68864772571267],
-                  [51.419381349542306, 35.68751061718493],
-                  [51.421420568591486, 35.69798176043251],
-                  [51.401234799345815, 35.69826694278217],
-                ],
-              ],
-              type: "Polygon",
-            },
-          },
-          {
-            type: "Feature",
-            properties: {},
-            geometry: {
-              coordinates: [
-                [
-                  [51.33343572995875, 35.72843408428626],
-                  [51.30861491012362, 35.728434467551295],
-                  [51.30875814944605, 35.70636796480834],
-                  [51.33343572995875, 35.72843408428626],
-                ],
-              ],
-              type: "Polygon",
-            },
-          },
-        ],
-      },
-    });
-
-    mapRef.current.addLayer({
-      id: "stage",
-      type: "fill",
-      source: "stage",
-      paint: {
-        "fill-color": "#0080ff", // blue color fill
-        "fill-opacity": 0.5,
-      },
-    });
-    // Add a black outline around the polygon.
-    mapRef.current.addLayer({
-      id: "outline",
-      type: "line",
-      source: "stage",
-      layout: {},
-      paint: {
-        "line-color": "#000",
-        "line-width": 1,
-      },
-    });
   }, []);
+
+  // Extract boundary values to display polygons on map
+  const geometryValue = stages?.value?.map((item) => item.boundary);
+  console.log("geometryValue", geometryValue);
+
+  const geojsonBoundaries = geometryValue?.map((boundary) => ({
+    geometry: boundary,
+    properties: {},
+  }));
+
+  console.log("geojsonFeatureCollection", geojsonBoundaries);
+  // const count = internalData?.["odata.count"]; // undefined | number
+
+  // can use useMemo with a dependency array of internalData for performance benefits
+  // const geojson = internalData?.value.map(); // create geojson feature collection (undefined | FeatureCollection)
+
+  // useEffect(() => {
+  if (!stages || !mapRef.current) return;
+
+  const geojsonFeatureCollection = {
+    type: "FeatureCollection",
+    features: geojsonBoundaries,
+  };
+
+  console.log("geojsonFeatureCollection", geojsonFeatureCollection);
+
+  // mapRef.current.addSource("geofence-polygons", {
+  //   type: "geojson",
+  //   data: geojsonFeatureCollection,
+  // });
+
+  if (!mapRef.current.getSource("geofence-polygons")) {
+    // console.log(
+    //   "debug",
+    //   geojsonFeatureCollection && geojsonFeatureCollection.features.length > 0
+    // );
+    if (
+      geojsonFeatureCollection &&
+      geojsonFeatureCollection.features.length > 0
+    ) {
+      // Check if geojsonFeatureCollection has a value
+      mapRef.current.addSource("geofence-polygons", {
+        type: "geojson",
+        data: geojsonFeatureCollection,
+      });
+      mapRef.current.addLayer({
+        id: "geofence-polygons-id",
+        type: "fill",
+        source: "geofence-polygons",
+        paint: {
+          "fill-color": "#0080ff", // blue color fill
+          "fill-opacity": 0.5,
+        },
+      });
+      // Add a black outline around the polygon.
+      mapRef.current.addLayer({
+        id: "outline",
+        type: "line",
+        source: "geofence-polygons",
+        layout: {},
+        paint: {
+          "line-color": "#000",
+          "line-width": 1,
+        },
+      });
+    } else {
+      console.log(
+        "geojsonFeatureCollection not yet available for adding source."
+      );
+    }
+  }
+
+  // }, [stages, geojsonFeatureCollection]);
+
+  // useEffect(() => {
+  //   // Check if data object exists (assuming it's fetched or passed as props)
+  //   if (stages) {
+  //     const geometryValue = {};
+  //     console.log("stagggg", stages);
+  //     // const values = stages["value"];
+  //     for (const item of stages.value) {
+  //       geometryValue[item.id] = item.boundary;
+  //     }
+  //     console.log("geometryValue", geometryValue);
+  //   }
+  // }, []);
+
+  // useEffect(() => {
+  //   if (stages) {
+  //     console.log("ggggggg", stages["value"]); // To check the result
+  //     const boundaryObj = stages["value"];
+  //     console.log(boundaryObj);
+  //     {
+  //       Object.entries(boundaryObj).map(([index, { boundary }]) =>
+  //         console.log("boundary", boundary)
+  //       );
+  //     }
+  //   }
+  // }, [stages]);
+
+  // useEffect(() => {
+  //   // Add source and layer only if mapRef is initialized and fileContent is available
+  //   if (mapRef.current && fileContent) {
+  //     try {
+  //       mapRef.current.addSource("uploadedPolygons", {
+  //         type: "geojson",
+  //         data: JSON.parse(fileContent),
+  //       });
+
+  //       mapRef.current.addLayer({
+  //         id: "polygonLayer",
+  //         type: "fill",
+  //         source: "uploadedPolygons",
+  //         paint: {
+  //           "fill-color": "#0080ff", // Blue color fill
+  //           "fill-opacity": 0.5,
+  //         },
+  //       });
+  //     } catch (error) {
+  //       console.error("Failed to add source or layer:", error);
+  //     }
+  //   }
+  // }, [fileContent, mapRef]);
 
   return (
     <div className="container">

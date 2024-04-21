@@ -66,6 +66,9 @@ export default function FindRoute() {
     }
 
     const geometry = await getRoute();
+
+    console.log("Geometry:", geometry);
+
     if (!geometry) {
       console.log("Geometry is null");
       return;
