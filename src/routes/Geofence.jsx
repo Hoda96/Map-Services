@@ -3,18 +3,12 @@ import MapContext from "../context/MapContext";
 
 const API_KEY = import.meta.env.VITE_API_KEY;
 
-// const stage = uploadStages({})
-// if (stage) {
-//   fetchAndSetStages()
-// }
-
 export default function Geofence() {
   const mapRef = useContext(MapContext);
 
   const [selectedFile, setSelectedFile] = useState();
   const [fileContent, setFileContent] = useState();
   const [stages, setStages] = useState({});
-  const [processedData, setProcessedData] = useState([]);
 
   const handleFileChange = (event) => {
     // console.log("file uploaded:", event.target.files);
@@ -26,7 +20,6 @@ export default function Geofence() {
       alert("Please select a file first");
       return;
     }
-
     // Create a new FileReader object
     let reader = new FileReader();
 
@@ -67,6 +60,27 @@ export default function Geofence() {
     reader.readAsText(selectedFile);
   };
 
+  // Select point directly on map, not fields in sidebar
+
+  const handlePointSubmit = () => {
+    alert("hi");
+    // function add_marker(e) {
+    //   console.log("e", e);
+    //   const marker = new maplibregl.Marker();
+    //   console.log("e.lngLat", e.lngLat);
+    //   const coords = e.lngLat;
+    //   marker.setLngLat(coords).addTo(mapRef.current);
+
+    //   // Save the marker in the state
+    //   setPoint(marker);
+
+    //   setCoordinates(coords);
+
+    //   mapRef.current.off("click", add_marker);
+    // }
+    // mapRef.current.on("click", add_marker);
+  };
+
   useEffect(() => {
     // Make a GET request to the API
     const fetchStages = async () => {
@@ -83,16 +97,6 @@ export default function Geofence() {
         console.log("data:", data);
 
         setStages(data);
-
-        // // Extract boundary values to display polygons on map
-        // const geometryValue = data.value.map((item) => item.boundary);
-        // console.log("geometryValue", typeof geometryValue);
-
-        // const geojsonBoundaries = geometryValue.map((boundary) => ({
-        //   type: "Polygon",
-        //   coordinates: boundary,
-        //   properties: {},
-        // }));
 
         console.log("final geojson", geojsonBoundaries);
         console.log("stages state", stages);
@@ -119,7 +123,6 @@ export default function Geofence() {
   // can use useMemo with a dependency array of internalData for performance benefits
   // const geojson = internalData?.value.map(); // create geojson feature collection (undefined | FeatureCollection)
 
-  // useEffect(() => {
   if (!stages || !mapRef.current) return;
 
   const geojsonFeatureCollection = {
@@ -129,16 +132,7 @@ export default function Geofence() {
 
   console.log("geojsonFeatureCollection", geojsonFeatureCollection);
 
-  // mapRef.current.addSource("geofence-polygons", {
-  //   type: "geojson",
-  //   data: geojsonFeatureCollection,
-  // });
-
   if (!mapRef.current.getSource("geofence-polygons")) {
-    // console.log(
-    //   "debug",
-    //   geojsonFeatureCollection && geojsonFeatureCollection.features.length > 0
-    // );
     if (
       geojsonFeatureCollection &&
       geojsonFeatureCollection.features.length > 0
@@ -175,58 +169,6 @@ export default function Geofence() {
     }
   }
 
-  // }, [stages, geojsonFeatureCollection]);
-
-  // useEffect(() => {
-  //   // Check if data object exists (assuming it's fetched or passed as props)
-  //   if (stages) {
-  //     const geometryValue = {};
-  //     console.log("stagggg", stages);
-  //     // const values = stages["value"];
-  //     for (const item of stages.value) {
-  //       geometryValue[item.id] = item.boundary;
-  //     }
-  //     console.log("geometryValue", geometryValue);
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   if (stages) {
-  //     console.log("ggggggg", stages["value"]); // To check the result
-  //     const boundaryObj = stages["value"];
-  //     console.log(boundaryObj);
-  //     {
-  //       Object.entries(boundaryObj).map(([index, { boundary }]) =>
-  //         console.log("boundary", boundary)
-  //       );
-  //     }
-  //   }
-  // }, [stages]);
-
-  // useEffect(() => {
-  //   // Add source and layer only if mapRef is initialized and fileContent is available
-  //   if (mapRef.current && fileContent) {
-  //     try {
-  //       mapRef.current.addSource("uploadedPolygons", {
-  //         type: "geojson",
-  //         data: JSON.parse(fileContent),
-  //       });
-
-  //       mapRef.current.addLayer({
-  //         id: "polygonLayer",
-  //         type: "fill",
-  //         source: "uploadedPolygons",
-  //         paint: {
-  //           "fill-color": "#0080ff", // Blue color fill
-  //           "fill-opacity": 0.5,
-  //         },
-  //       });
-  //     } catch (error) {
-  //       console.error("Failed to add source or layer:", error);
-  //     }
-  //   }
-  // }, [fileContent, mapRef]);
-
   return (
     <div className="container">
       <div className="sidebar">
@@ -242,15 +184,23 @@ export default function Geofence() {
             </button>
           </div>
           <div className="divider"></div>
-          <div className="groupBtn">
-            <button className="btn">Delete Stage</button>
-          </div>
         </div>
         <div className="addCoords">
-          <p>
+          <p style={{ lineHeight: "1.5rem", marginBottom: "2rem" }}>
             Select a point on the map or insert the coordinates to Verify its
             Location.
           </p>
+          <form action="submit" onSubmit={handlePointSubmit}>
+            <div className="uploadBtn">
+              <label htmlFor="latInput">Latitude: </label>
+              <input type="text" name="lat" id="latInput" />
+            </div>
+            <div className="uploadBtn">
+              <label htmlFor="latInput">Longitude: </label>
+              <input type="text" name="lng" id="lngInput" />
+            </div>
+            <button className="btn">Verify Point</button>
+          </form>
         </div>
       </div>
     </div>

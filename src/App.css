@@ -31,7 +31,7 @@ body {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  justify-content: space-between;
+  justify-content: start;
   align-content: center;
   align-items: center;
 }
@@ -100,6 +100,7 @@ text-shadow: #f1f1f1;
 .title{
   font-size: 1rem;
 font-weight: 700;
+
 }
 
 .hero-p{
@@ -180,7 +181,7 @@ font-weight: 500;
   flex-direction: row;
   justify-content: space-between;
   align-items: baseline;
-  margin: 2rem 0;
+margin: 1rem 0;
 }
 input[type="file"]{
   width: 190px;
@@ -191,5 +192,12 @@ input#file-upload-button{
 .divider{
   border: 1px solid #f2f2f2;
   opacity: 0.3;
-  margin: 2rem 0;
+  margin: 2rem 0 1.5rem 0;
+}
+#latInput, #lngInput {
+  padding: 0.5rem;
+  border: none;
+  box-shadow: none;
+  border-radius: 16px;
+
 }
