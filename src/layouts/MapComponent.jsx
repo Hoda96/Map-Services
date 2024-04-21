@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import MapContext from "../context/MapContext";
-
+import { useLocation } from "react-router-dom";
+import { useCleanMap } from "../hooks/useCleanMap";
 const API_KEY = import.meta.env.VITE_API_KEY;
 
 export default function MapComponent() {
@@ -10,6 +11,9 @@ export default function MapComponent() {
   const lng = 51.5;
   const lat = 35.72;
   const zoom = 12;
+  // const { clearMap } = useCleanMap(mapContainer);
+  // const location = useLocation();
+
   useEffect(() => {
     if (mapRef.current) return;
 
@@ -27,6 +31,7 @@ export default function MapComponent() {
         };
       },
     });
+    // clearMap();
   }, []);
 
   return <div ref={mapContainer} className="map-container" />;

@@ -1,18 +1,17 @@
 import { useContext, useEffect, useRef } from 'react';
-import mapboxgl from '!mapbox-gl'; // Assuming you're using mapbox-gl
 import MapContext from '../context/MapContext';
 
- function useCleanMap(mapContainerRef) {
+export function useCleanMap(mapContainerRef) {
   const mapRef = useContext(MapContext)
 
   useEffect(() => {
     // Initialize map only once
-    if (!mapRef.current) {
-      mapRef.current = new mapboxgl.Map({
-        container: mapContainerRef.current,
-        // ... your map initialization options
-      });
-    }
+    // if (!mapRef.current) {
+    //   mapRef.current = new mapboxgl.Map({
+    //     container: mapContainerRef.current,
+    //     // ... your map initialization options
+    //   });
+    // }
 
     return () => {
       // Clean up map resources when the component unmounts

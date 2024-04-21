@@ -62,25 +62,6 @@ export default function Geofence() {
 
   // Select point directly on map, not fields in sidebar
 
-  const handlePointSubmit = () => {
-    alert("hi");
-    // function add_marker(e) {
-    //   console.log("e", e);
-    //   const marker = new maplibregl.Marker();
-    //   console.log("e.lngLat", e.lngLat);
-    //   const coords = e.lngLat;
-    //   marker.setLngLat(coords).addTo(mapRef.current);
-
-    //   // Save the marker in the state
-    //   setPoint(marker);
-
-    //   setCoordinates(coords);
-
-    //   mapRef.current.off("click", add_marker);
-    // }
-    // mapRef.current.on("click", add_marker);
-  };
-
   useEffect(() => {
     // Make a GET request to the API
     const fetchStages = async () => {
@@ -132,36 +113,36 @@ export default function Geofence() {
 
   console.log("geojsonFeatureCollection", geojsonFeatureCollection);
 
-  if (!mapRef.current.getSource("geofence-polygons")) {
+  if (mapRef.current.getSource("geofence-polygons")) {
     if (
       geojsonFeatureCollection &&
       geojsonFeatureCollection.features.length > 0
     ) {
       // Check if geojsonFeatureCollection has a value
-      mapRef.current.addSource("geofence-polygons", {
-        type: "geojson",
-        data: geojsonFeatureCollection,
-      });
-      mapRef.current.addLayer({
-        id: "geofence-polygons-id",
-        type: "fill",
-        source: "geofence-polygons",
-        paint: {
-          "fill-color": "#0080ff", // blue color fill
-          "fill-opacity": 0.5,
-        },
-      });
-      // Add a black outline around the polygon.
-      mapRef.current.addLayer({
-        id: "outline",
-        type: "line",
-        source: "geofence-polygons",
-        layout: {},
-        paint: {
-          "line-color": "#000",
-          "line-width": 1,
-        },
-      });
+      // mapRef.current.addSource("geofence-polygons", {
+      //   type: "geojson",
+      //   data: geojsonFeatureCollection,
+      // });
+      // mapRef.current.addLayer({
+      //   id: "geofence-polygons-id",
+      //   type: "fill",
+      //   source: "geofence-polygons",
+      //   paint: {
+      //     "fill-color": "#0080ff", // blue color fill
+      //     "fill-opacity": 0.5,
+      //   },
+      // });
+      // // Add a black outline around the polygon.
+      // mapRef.current.addLayer({
+      //   id: "outline",
+      //   type: "line",
+      //   source: "geofence-polygons",
+      //   layout: {},
+      //   paint: {
+      //     "line-color": "#000",
+      //     "line-width": 1,
+      //   },
+      // });
     } else {
       console.log(
         "geojsonFeatureCollection not yet available for adding source."
@@ -190,17 +171,17 @@ export default function Geofence() {
             Select a point on the map or insert the coordinates to Verify its
             Location.
           </p>
-          <form action="submit" onSubmit={handlePointSubmit}>
-            <div className="uploadBtn">
-              <label htmlFor="latInput">Latitude: </label>
-              <input type="text" name="lat" id="latInput" />
-            </div>
-            <div className="uploadBtn">
-              <label htmlFor="latInput">Longitude: </label>
-              <input type="text" name="lng" id="lngInput" />
-            </div>
-            <button className="btn">Verify Point</button>
-          </form>
+          {/* <form action="submit" onSubmit={handlePointSubmit}> */}
+          <div className="uploadBtn">
+            <label htmlFor="latInput">Latitude: </label>
+            <input type="text" name="lat" id="latInput" />
+          </div>
+          <div className="uploadBtn">
+            <label htmlFor="latInput">Longitude: </label>
+            <input type="text" name="lng" id="lngInput" />
+          </div>
+          <button className="btn">Verify Point</button>
+          {/* </form> */}
         </div>
       </div>
     </div>
