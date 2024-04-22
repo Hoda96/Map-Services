@@ -12,8 +12,8 @@ export default function Geofence() {
   const [fileContent, setFileContent] = useState();
   const [stages, setStages] = useState({});
 
-  const [lng, setLng] = useState(null);
-  const [lat, setLat] = useState(null);
+  const [lng, setLng] = useState(" ");
+  const [lat, setLat] = useState("");
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
@@ -88,7 +88,6 @@ export default function Geofence() {
     // Call the async function
     fetchStages();
   }, []);
-
   // Select point directly on map, not fields in sidebar
   // Mark location on map by clicking on map
   function add_marker2(e) {
@@ -101,34 +100,40 @@ export default function Geofence() {
   }
   mapRef.current?.on("click", add_marker2);
 
-  // Check if location is in a stage or not
-  useEffect(() => {
-    const checkBoundary = async () => {
-      const url = `https://map.ir/geofence/boundaries?lat=${lat}&lon=${lng}`;
-      const options = {
-        method: "GET",
-        headers: {
-          "x-api-key": API_KEY,
-        },
-      };
+  async function handlePointSubmit() {
+    if (!lat && !lng) return;
+    const isPointValid = await checkBoundary();
+    console.log("call checkboundary", isPointValid);
+    if (typeof isPointValid != "undefined") {
+      alert("Yey, point is verified :)");
+    } else alert("No, Point is not verified :(");
 
-      try {
-        const response = await fetch(url, options);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        if (data.status !== "404") {
-          alert("Yey, point is verified :)");
-        } else return;
-      } catch (error) {
-        console.error(error);
-      }
+    setLat(" ");
+    setLng(" ");
+  }
+
+  // Check if location is in a stage or not
+
+  const checkBoundary = async () => {
+    const url = `https://map.ir/geofence/boundaries?lat=${lat}&lon=${lng}`;
+    const options = {
+      method: "GET",
+      headers: {
+        "x-api-key": API_KEY,
+      },
     };
-    if (lat && lng) {
-      checkBoundary();
+
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(error);
     }
-  }, [lat, lng]);
+  };
 
   // Extract boundary values to display polygons on map
   const geometryValue = stages?.value?.map((item) => item.boundary);
@@ -224,13 +229,27 @@ export default function Geofence() {
           {/* <form action="submit" onSubmit={handlePointSubmit}> */}
           <div className="uploadBtn">
             <label htmlFor="latInput">Latitude: </label>
-            <input type="text" name="lat" id="latInput" />
+            <input
+              type="text"
+              name="lat"
+              id="latInput"
+              value={lat}
+              onChange={(e) => setLat(e.target.value)}
+            />
           </div>
           <div className="uploadBtn">
             <label htmlFor="latInput">Longitude: </label>
-            <input type="text" name="lng" id="lngInput" />
+            <input
+              type="text"
+              name="lng"
+              id="lngInput"
+              value={lng}
+              onChange={(e) => setLng(e.target.value)}
+            />
           </div>
-          <button className="btn">Verify Point</button>
+          <button className="btn" onClick={handlePointSubmit}>
+            Verify Point
+          </button>
           {/* </form> */}
         </div>
       </div>
