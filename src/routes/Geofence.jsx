@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import MapContext from "../context/MapContext";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -7,7 +7,7 @@ const API_KEY = import.meta.env.VITE_API_KEY;
 
 export default function Geofence() {
   const mapRef = useContext(MapContext);
-
+  const markerRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState();
   const [fileContent, setFileContent] = useState();
   const [stages, setStages] = useState({});
@@ -91,10 +91,16 @@ export default function Geofence() {
   // Select point directly on map, not fields in sidebar
   // Mark location on map by clicking on map
   function add_marker2(e) {
+    if (markerRef.current) {
+      //Remove previous marker on double click
+      markerRef.current.remove();
+    }
+
     const marker = new maplibregl.Marker();
     console.log("e.lngLat", e.lngLat);
     const { lng, lat } = e.lngLat;
     marker.setLngLat({ lng, lat }).addTo(mapRef.current);
+    markerRef.current = marker;
     setLng(lng);
     setLat(lat);
   }
