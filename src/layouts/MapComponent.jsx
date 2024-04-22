@@ -8,9 +8,9 @@ const API_KEY = import.meta.env.VITE_API_KEY;
 export default function MapComponent() {
   const mapContainer = useRef(null);
   const mapRef = useContext(MapContext);
-  const lng = 51.5;
+  const lng = 51.4;
   const lat = 35.72;
-  const zoom = 12;
+  const zoom = 11;
   // const { clearMap } = useCleanMap(mapContainer);
   // const location = useLocation();
 

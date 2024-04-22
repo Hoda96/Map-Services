@@ -11,7 +11,6 @@ export default function Geofence() {
   const [stages, setStages] = useState({});
 
   const handleFileChange = (event) => {
-    // console.log("file uploaded:", event.target.files);
     setSelectedFile(event.target.files[0]);
   };
 
@@ -61,7 +60,6 @@ export default function Geofence() {
   };
 
   // Select point directly on map, not fields in sidebar
-
   useEffect(() => {
     // Make a GET request to the API
     const fetchStages = async () => {
@@ -75,12 +73,9 @@ export default function Geofence() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("data:", data);
-
+        console.log("data is ready now:", data);
         setStages(data);
-
-        console.log("final geojson", geojsonBoundaries);
-        console.log("stages state", stages);
+        console.log("stage is updated now:", stages);
       } catch (error) {
         console.log("Failed to get stages", error);
       }
@@ -98,12 +93,6 @@ export default function Geofence() {
     properties: {},
   }));
 
-  console.log("geojsonBoundaries", geojsonBoundaries);
-  // const count = internalData?.["odata.count"]; // undefined | number
-
-  // can use useMemo with a dependency array of internalData for performance benefits
-  // const geojson = internalData?.value.map(); // create geojson feature collection (undefined | FeatureCollection)
-
   if (!stages || !mapRef.current) return;
 
   const geojsonFeatureCollection = {
@@ -111,12 +100,10 @@ export default function Geofence() {
     features: geojsonBoundaries,
   };
 
-  // console.log("geojsonFeatureCollection", geojsonFeatureCollection);
-
   if (!mapRef.current.getSource("geofence-polygons")) {
     if (
       geojsonFeatureCollection &&
-      geojsonFeatureCollection.features.length > 0
+      geojsonFeatureCollection?.features?.length > 0
     ) {
       // Check if geojsonFeatureCollection has a value
       mapRef.current.addSource("geofence-polygons", {
@@ -153,19 +140,24 @@ export default function Geofence() {
   return (
     <div className="container">
       <div className="sidebar">
-        <div className="uploadStage">
-          <h2>Uploaded Stages</h2>
-          <p>
-            You have uploaded {stages && stages["odata.count"]} stages so far.
-          </p>
-          <div className="uploadBtn">
-            <input type="file" onChange={handleFileChange} className="" />
-            <button onClick={handleUpload} className="btn">
-              Upload GeoJSON
-            </button>
+        {stages && stages["odata.count"] ? (
+          <div className="uploadStage">
+            <h2>Uploaded Stages</h2>
+            <p>
+              You have uploaded {stages && stages?.["odata.count"]} stages so
+              far.
+            </p>
           </div>
-          <div className="divider"></div>
+        ) : (
+          <p>Loading</p>
+        )}
+        <div className="uploadBtn">
+          <input type="file" onChange={handleFileChange} className="" />
+          <button onClick={handleUpload} className="btn">
+            Upload GeoJSON
+          </button>
         </div>
+        <div className="divider"></div>
         <div className="addCoords">
           <p style={{ lineHeight: "1.5rem", marginBottom: "2rem" }}>
             Select a point on the map or insert the coordinates to Verify its
@@ -185,5 +177,6 @@ export default function Geofence() {
         </div>
       </div>
     </div>
+    // </div>
   );
 }
