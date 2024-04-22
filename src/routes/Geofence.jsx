@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import MapContext from "../context/MapContext";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 
 const API_KEY = import.meta.env.VITE_API_KEY;
 
@@ -9,6 +11,9 @@ export default function Geofence() {
   const [selectedFile, setSelectedFile] = useState();
   const [fileContent, setFileContent] = useState();
   const [stages, setStages] = useState({});
+
+  const [lng, setLng] = useState(null);
+  const [lat, setLat] = useState(null);
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
@@ -84,6 +89,47 @@ export default function Geofence() {
     fetchStages();
   }, []);
 
+  // Select point directly on map, not fields in sidebar
+  // Mark location on map by clicking on map
+  function add_marker2(e) {
+    const marker = new maplibregl.Marker();
+    console.log("e.lngLat", e.lngLat);
+    const { lng, lat } = e.lngLat;
+    marker.setLngLat({ lng, lat }).addTo(mapRef.current);
+    setLng(lng);
+    setLat(lat);
+  }
+  mapRef.current?.on("click", add_marker2);
+
+  // Check if location is in a stage or not
+  useEffect(() => {
+    const checkBoundary = async () => {
+      const url = `https://map.ir/geofence/boundaries?lat=${lat}&lon=${lng}`;
+      const options = {
+        method: "GET",
+        headers: {
+          "x-api-key": API_KEY,
+        },
+      };
+
+      try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.status !== "404") {
+          alert("Yey, point is verified :)");
+        } else return;
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    if (lat && lng) {
+      checkBoundary();
+    }
+  }, [lat, lng]);
+
   // Extract boundary values to display polygons on map
   const geometryValue = stages?.value?.map((item) => item.boundary);
   console.log("geometryValue", geometryValue);
@@ -136,6 +182,18 @@ export default function Geofence() {
       "geojsonFeatureCollection not yet available for adding source."
     );
   }
+
+  // if (lat && lng) {
+  //   const userSelectedLocation = [lng, lat]; // Assuming selectedLocation is an array with [lon, lat]
+  //   console.log("userSelectedLocation", userSelectedLocation);
+  //   const url = new URL(
+  //     "https://map.ir/geofence/boundaries",
+  //     window.location.origin
+  //   );
+  //   console.log("url", url);
+  //   url.searchParams.append("lat", userSelectedLocation[1]); // Latitude goes first
+  //   url.searchParams.append("lon", userSelectedLocation[0]); // Longitude follows
+  // }
 
   return (
     <div className="container">
