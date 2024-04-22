@@ -113,42 +113,42 @@ export default function Geofence() {
 
   // console.log("geojsonFeatureCollection", geojsonFeatureCollection);
 
-  // if (mapRef.current.getSource("geofence-polygons")) {
-  // if (
-  //   geojsonFeatureCollection &&
-  //   geojsonFeatureCollection.features.length > 0
-  // ) {
-  // Check if geojsonFeatureCollection has a value
-  mapRef.current.addSource("geofence-polygons", {
-    type: "geojson",
-    data: geojsonFeatureCollection,
-  });
-  mapRef.current.addLayer({
-    id: "geofence-polygons-id",
-    type: "fill",
-    source: "geofence-polygons",
-    paint: {
-      "fill-color": "#0080ff", // blue color fill
-      "fill-opacity": 0.5,
-    },
-  });
-  // Add a black outline around the polygon.
-  // mapRef.current.addLayer({
-  //   id: "outline",
-  //   type: "line",
-  //   source: "geofence-polygons",
-  //   layout: {},
-  //   paint: {
-  //     "line-color": "#000",
-  //     "line-width": 1,
-  //   },
-  // });
-  // }
-  // else {
-  //   console.log(
-  //     "geojsonFeatureCollection not yet available for adding source."
-  //   );
-  // }
+  if (!mapRef.current.getSource("geofence-polygons")) {
+    if (
+      geojsonFeatureCollection &&
+      geojsonFeatureCollection.features.length > 0
+    ) {
+      // Check if geojsonFeatureCollection has a value
+      mapRef.current.addSource("geofence-polygons", {
+        type: "geojson",
+        data: geojsonFeatureCollection,
+      });
+      mapRef.current.addLayer({
+        id: "geofence-polygons-id",
+        type: "fill",
+        source: "geofence-polygons",
+        paint: {
+          "fill-color": "#0080ff", // blue color fill
+          "fill-opacity": 0.5,
+        },
+      });
+      // Add a black outline around the polygon.
+      // mapRef.current.addLayer({
+      //   id: "outline",
+      //   type: "line",
+      //   source: "geofence-polygons",
+      //   layout: {},
+      //   paint: {
+      //     "line-color": "#000",
+      //     "line-width": 1,
+      //   },
+      // });
+    }
+  } else {
+    console.log(
+      "geojsonFeatureCollection not yet available for adding source."
+    );
+  }
 
   return (
     <div className="container">
