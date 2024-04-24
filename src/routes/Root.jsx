@@ -1,7 +1,5 @@
 import maplibregl from "maplibre-gl";
-import React, {
-  useRef
-} from "react";
+import React, { useRef } from "react";
 import { Outlet } from "react-router-dom";
 import MapContext from "../context/MapContext";
 import MapComponent from "../layouts/MapComponent";

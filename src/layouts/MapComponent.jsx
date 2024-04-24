@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import MapContext from "../context/MapContext";
 import { useLocation } from "react-router-dom";
@@ -11,9 +11,6 @@ export default function MapComponent() {
   const lng = 51.4;
   const lat = 35.72;
   const zoom = 11;
-  const { cleanMap } = useCleanMap(mapContainer);
-  const location = useLocation();
-  console.log("location", location);
 
   useEffect(() => {
     if (mapRef.current) return;
@@ -32,12 +29,7 @@ export default function MapComponent() {
         };
       },
     });
-
-    // cleanMap(); // Initial cleanup (optional)
-    return () => {
-      cleanMap();
-    }; // Cleanup on unmount
-  }, [location]);
+  }, []);
 
   return <div ref={mapContainer} className="map-container" />;
 }

@@ -1,9 +1,13 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import MapContext from "../context/MapContext";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 const API_KEY = import.meta.env.VITE_API_KEY;
+
+const SOURCE_ID = "geofence-polygons-source";
+const LAYER_ID = "geofence-polygons-layer";
+const marker = new maplibregl.Marker();
 
 export default function Geofence() {
   const mapRef = useContext(MapContext);
@@ -88,6 +92,7 @@ export default function Geofence() {
     // Call the async function
     fetchStages();
   }, []);
+
   // Select point directly on map, not fields in sidebar
   // Mark location on map by clicking on map
   function add_marker2(e) {
@@ -96,7 +101,6 @@ export default function Geofence() {
       markerRef.current.remove();
     }
 
-    const marker = new maplibregl.Marker();
     console.log("e.lngLat", e.lngLat);
     const { lng, lat } = e.lngLat;
     marker.setLngLat({ lng, lat }).addTo(mapRef.current);
@@ -141,58 +145,63 @@ export default function Geofence() {
     }
   };
 
-  // Extract boundary values to display polygons on map
-  const geometryValue = stages?.value?.map((item) => item.boundary);
-  console.log("geometryValue", geometryValue);
+  useEffect(() => {
+    if (!mapRef.current || !stages?.value?.length) return;
 
-  const geojsonBoundaries = geometryValue?.map((boundary) => ({
-    geometry: boundary,
-    properties: {},
-  }));
+    const features = stages?.value?.map((st) => ({
+      geometry: st.boundary,
+      properties: {},
+      type: "Feature",
+    }));
 
-  if (!stages || !mapRef.current) return;
+    const featureCollection = {
+      type: "FeatureCollection",
+      features,
+    };
 
-  const geojsonFeatureCollection = {
-    type: "FeatureCollection",
-    features: geojsonBoundaries,
-  };
+    const source = mapRef.current?.getSource?.(SOURCE_ID);
 
-  if (!mapRef.current.getSource("geofence-polygons")) {
-    if (
-      geojsonFeatureCollection &&
-      geojsonFeatureCollection?.features?.length > 0
-    ) {
-      // Check if geojsonFeatureCollection has a value
-      mapRef.current.addSource("geofence-polygons", {
+    if (source) {
+      console.log("featureCollection", featureCollection);
+      // update
+      source.setData({
         type: "geojson",
-        data: geojsonFeatureCollection,
+        data: featureCollection,
       });
+    } else {
+      // add
+      mapRef.current.addSource(SOURCE_ID, {
+        type: "geojson",
+        data: featureCollection,
+      });
+
       mapRef.current.addLayer({
-        id: "geofence-polygons-id",
+        id: LAYER_ID,
         type: "fill",
-        source: "geofence-polygons",
+        source: SOURCE_ID,
         paint: {
           "fill-color": "#0080ff", // blue color fill
           "fill-opacity": 0.5,
         },
       });
-      // Add a black outline around the polygon.
-      // mapRef.current.addLayer({
-      //   id: "outline",
-      //   type: "line",
-      //   source: "geofence-polygons",
-      //   layout: {},
-      //   paint: {
-      //     "line-color": "#000",
-      //     "line-width": 1,
-      //   },
-      // });
     }
-  } else {
-    console.log(
-      "geojsonFeatureCollection not yet available for adding source."
-    );
-  }
+  }, [stages, mapRef.current]);
+
+  // clean up map
+  useEffect(() => {
+    return () => {
+      try {
+        const map = mapRef.current;
+        if (!map) return;
+
+        map.getLayer(LAYER_ID) && map.removeLayer(LAYER_ID);
+        map.getSource(SOURCE_ID) && map.removeSource(SOURCE_ID);
+        marker.remove();
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  }, []);
 
   // if (lat && lng) {
   //   const userSelectedLocation = [lng, lat]; // Assuming selectedLocation is an array with [lon, lat]
