@@ -1,4 +1,11 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import MapContext from "../context/MapContext";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -19,6 +26,26 @@ export default function Geofence() {
 
   const [lng, setLng] = useState(" ");
   const [lat, setLat] = useState("");
+
+  // 1. use useCallback (because you will need the same function reference when removing the listener)
+  // 2. wrap event listener with useEffect
+  // 3. add clean up func to useEffect
+  // 3.1 move clean up from other useEffect to a better place!
+  const add_marker2 = useCallback((e) => {
+    // function add_marker2(e) {
+    if (markerRef.current) {
+      //Remove previous marker on double click
+      markerRef.current.remove();
+    }
+    console.log("e.lngLat", e.lngLat);
+    const { lng, lat } = e.lngLat;
+    marker.setLngLat({ lng, lat }).addTo(mapRef.current);
+    markerRef.current = marker;
+    setLng(lng);
+    setLat(lat);
+    // }
+    return { lng, lat };
+  }, []);
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
@@ -95,24 +122,13 @@ export default function Geofence() {
   // Select point directly on map, not fields in sidebar
   // Mark location on map by clicking on map
 
-  // 1. use useCallback (because you will need the same function reference when removing the listener)
-  // 2. wrap event listener with useEffect
-  // 3. add clean up func to useEffect
-  // 3.1 move clean up from other useEffect to a better place!
-  function add_marker2(e) {
-    if (markerRef.current) {
-      //Remove previous marker on double click
-      markerRef.current.remove();
-    }
-    console.log("e.lngLat", e.lngLat);
-    const { lng, lat } = e.lngLat;
-    marker.setLngLat({ lng, lat }).addTo(mapRef.current);
-    markerRef.current = marker;
-    setLng(lng);
-    setLat(lat);
-  }
+  useEffect(() => {
+    mapRef.current?.on("click", add_marker2);
 
-  mapRef.current?.on("click", add_marker2);
+    return () => {
+      mapRef.current?.off("click", add_marker2);
+    };
+  }, []);
 
   async function handlePointSubmit() {
     if (!lat && !lng) return;
@@ -128,7 +144,6 @@ export default function Geofence() {
   }
 
   // Check if location is in a stage or not
-
   const checkBoundary = async () => {
     const url = `https://map.ir/geofence/boundaries?lat=${lat}&lon=${lng}`;
     const options = {
@@ -200,7 +215,7 @@ export default function Geofence() {
         map.getSource(SOURCE_ID) && map.removeSource(SOURCE_ID);
 
         //Remove previous marker on double click
-        markerRef.current.remove();
+        // markerRef.current.remove();
       } catch (error) {
         console.log(error);
       }
