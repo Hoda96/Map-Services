@@ -1,8 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import MapContext from "../context/MapContext";
-import { useLocation } from "react-router-dom";
-import { useCleanMap } from "../hooks/useCleanMap";
 const API_KEY = import.meta.env.VITE_API_KEY;
 
 export default function MapComponent() {

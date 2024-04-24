@@ -1,14 +1,16 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "../App.css";
 import MapContext from "../context/MapContext";
 
 const API_KEY = import.meta.env.VITE_API_KEY;
+const SOURCE_ID = "route-layer";
+const LAYER_ID = "route";
 
 export default function FindRoute() {
   const mapRef = useContext(MapContext);
-
+  // const markerRef = useRef(null);
   const [point, setPoint] = useState({ start: false, destination: false });
   const [coordinates, setCoordinates] = useState({
     startLng: null,
@@ -31,16 +33,17 @@ export default function FindRoute() {
     setPoint((prev) => ({ ...prev, [type]: !prev[type] }));
     function add_marker(e) {
       console.log("e", e);
-      const marker = new maplibregl.Marker();
+      const markerr = new maplibregl.Marker();
       console.log("e.lngLat", e.lngLat);
       const coords = e.lngLat;
-      marker.setLngLat(coords).addTo(mapRef.current);
-
-      // Save the marker in the state
+      markerr.setLngLat(coords).addTo(mapRef.current);
+      // markerRef.current = markerr;
+      // Save the markerr in the state
       setMarkers((prevState) => ({
         ...prevState,
-        [type]: marker,
+        [type]: markerr,
       }));
+      console.log("markers:", markers);
 
       setCoordinates((prevState) => ({
         ...prevState,
@@ -74,30 +77,29 @@ export default function FindRoute() {
       return;
     }
 
-    const routeSource = mapRef.current.getSource("route");
+    const routeSource = mapRef.current?.getSource?.(SOURCE_ID);
     // Check if the route source already exists
     if (routeSource) {
       // Update the route source data with the new coordinates
-      routeSource.setData({
+      routeSource?.setData({
         type: "Feature",
         properties: {},
         geometry: geometry,
       });
     } else {
       // If the route source does not exist, add it
-      mapRef.current.addSource("route", {
+      mapRef.current.addSource(SOURCE_ID, {
         type: "geojson",
         data: {
           type: "Feature",
           geometry: geometry,
         },
       });
-
       // Add the route layer
       mapRef.current.addLayer({
-        id: "route",
+        id: LAYER_ID,
         type: "line",
-        source: "route",
+        source: SOURCE_ID,
         paint: {
           "line-color": "#eb4034", // Color of the route
           "line-width": 4, // Width of the route
@@ -133,6 +135,22 @@ export default function FindRoute() {
       return null;
     }
   };
+
+  useEffect(() => {
+    return () => {
+      try {
+        if (!mapRef.current) return;
+        mapRef.current.getLayer(LAYER_ID) &&
+          mapRef.current.removeLayer(LAYER_ID);
+        mapRef.current.getSource(SOURCE_ID) &&
+          mapRef.current.removeSource(SOURCE_ID);
+
+        // markerRef.current["start"].remove();
+      } catch (error) {
+        console.log("Error:", error);
+      }
+    };
+  }, []);
 
   return (
     <div className="container">
