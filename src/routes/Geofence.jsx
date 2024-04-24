@@ -2,7 +2,6 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -17,15 +16,39 @@ const LAYER_ID = "geofence-polygons-layer";
 
 const marker = new maplibregl.Marker();
 
+// Check if location is in a stage or not
+const checkIsPointInStage = async (coords) => {
+  const url = `https://map.ir/geofence/boundaries?lat=${coords["lat"]}&lon=${coords["lng"]}`;
+  const options = {
+    method: "GET",
+    headers: {
+      "x-api-key": API_KEY,
+    },
+  };
+
+  try {
+    const response = await fetch(url, options);
+    const data = await response.json();
+    return data.value.length > 0;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
 export default function Geofence() {
   const mapRef = useContext(MapContext);
   const markerRef = useRef(null);
+
   const [selectedFile, setSelectedFile] = useState();
-  const [fileContent, setFileContent] = useState();
+
   const [stages, setStages] = useState({});
 
-  const [lng, setLng] = useState(" ");
-  const [lat, setLat] = useState("");
+  // 1. turn this into one state
+  // 2. initialize value = null, it's null or number.
+  const [coords, setCoords] = useState({ lng: null, lat: null });
+  // const [lng, setLng] = useState(null);
+  // const [lat, setLat] = useState(null);
 
   // 1. use useCallback (because you will need the same function reference when removing the listener)
   // 2. wrap event listener with useEffect
@@ -38,13 +61,13 @@ export default function Geofence() {
       markerRef.current.remove();
     }
     console.log("e.lngLat", e.lngLat);
-    const { lng, lat } = e.lngLat;
-    marker.setLngLat({ lng, lat }).addTo(mapRef.current);
+    const coordinates = e.lngLat;
+    marker.setLngLat(coordinates).addTo(mapRef.current);
     markerRef.current = marker;
-    setLng(lng);
-    setLat(lat);
-    // }
-    return { lng, lat };
+    setCoords(coordinates);
+    console.log("coords", coords);
+    // setLng(lng);
+    // setLat(lat);
   }, []);
 
   const handleFileChange = (event) => {
@@ -61,9 +84,6 @@ export default function Geofence() {
 
     // Setup the callback event to run when file reading is complete
     reader.onloadend = async (e) => {
-      // Set the file content to the state
-      setFileContent(e.target.result);
-
       // Create a new FormData instance
       let formData = new FormData();
       console.log("formData:", formData);
@@ -131,39 +151,21 @@ export default function Geofence() {
   }, []);
 
   async function handlePointSubmit() {
-    if (!lat && !lng) return;
-    const isPointValid = await checkBoundary();
-    marker.setLngLat({ lng, lat }).addTo(mapRef.current);
+    if (!coords["lat"] || !coords["lng"]) return;
 
-    if (typeof isPointValid != "undefined") {
+    const isPointInStage = await checkIsPointInStage(coords);
+
+    marker.setLngLat(coords).addTo(mapRef.current);
+
+    if (isPointInStage) {
       alert("Yey, point is verified :)");
-    } else alert("No, Point is not verified :(");
-
-    setLat(" ");
-    setLng(" ");
-  }
-
-  // Check if location is in a stage or not
-  const checkBoundary = async () => {
-    const url = `https://map.ir/geofence/boundaries?lat=${lat}&lon=${lng}`;
-    const options = {
-      method: "GET",
-      headers: {
-        "x-api-key": API_KEY,
-      },
-    };
-
-    try {
-      const response = await fetch(url, options);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error(error);
+    } else {
+      alert("No, Point is not verified :(");
     }
-  };
+    setCoords(null);
+    // setLat(null);
+    // setLng(null);
+  }
 
   useEffect(() => {
     if (!mapRef.current || !stages?.value?.length) return;
@@ -215,7 +217,7 @@ export default function Geofence() {
         map.getSource(SOURCE_ID) && map.removeSource(SOURCE_ID);
 
         //Remove previous marker on double click
-        // markerRef.current.remove();
+        // markerRef.current?.remove();
       } catch (error) {
         console.log(error);
       }
@@ -285,8 +287,13 @@ export default function Geofence() {
               type="text"
               name="lat"
               id="latInput"
-              value={lat}
-              onChange={(e) => setLat(e.target.value)}
+              value={coords["lat"]}
+              onChange={(e) =>
+                setCoords((prev) => ({
+                  ...prev,
+                  lat: e.target.value,
+                }))
+              }
             />
           </div>
           <div className="uploadBtn">
@@ -295,8 +302,13 @@ export default function Geofence() {
               type="text"
               name="lng"
               id="lngInput"
-              value={lng}
-              onChange={(e) => setLng(e.target.value)}
+              value={coords["lng"]}
+              onChange={(e) =>
+                setCoords((prev) => ({
+                  ...prev,
+                  lng: e.target.value,
+                }))
+              }
             />
           </div>
           <button className="btn" onClick={handlePointSubmit}>

@@ -11,6 +11,7 @@ export default function MapComponent() {
   const zoom = 11;
 
   useEffect(() => {
+    if (!mapContainer.current) return;
     if (mapRef.current) return;
 
     mapRef.current = new maplibregl.Map({
