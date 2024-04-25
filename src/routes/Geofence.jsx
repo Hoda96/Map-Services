@@ -29,6 +29,7 @@ const checkIsPointInStage = async (coords) => {
   try {
     const response = await fetch(url, options);
     const data = await response.json();
+    console.log("checkispoin data", data);
     return data.value.length > 0;
   } catch (error) {
     console.error(error);
@@ -46,7 +47,7 @@ export default function Geofence() {
 
   // 1. turn this into one state
   // 2. initialize value = null, it's null or number.
-  const [coords, setCoords] = useState({ lng: null, lat: null });
+  const [coords, setCoords] = useState({ lng: " ", lat: " " });
   // const [lng, setLng] = useState(null);
   // const [lat, setLat] = useState(null);
 
@@ -66,8 +67,6 @@ export default function Geofence() {
     markerRef.current = marker;
     setCoords(coordinates);
     console.log("coords", coords);
-    // setLng(lng);
-    // setLat(lat);
   }, []);
 
   const handleFileChange = (event) => {
@@ -139,9 +138,7 @@ export default function Geofence() {
     fetchStages();
   }, []);
 
-  // Select point directly on map, not fields in sidebar
-  // Mark location on map by clicking on map
-
+  // remove Listener
   useEffect(() => {
     mapRef.current?.on("click", add_marker2);
 
@@ -150,8 +147,9 @@ export default function Geofence() {
     };
   }, []);
 
+  // add marler to map after click on submit button
   async function handlePointSubmit() {
-    if (!coords["lat"] || !coords["lng"]) return;
+    if (!coords.lat || !coords.lng) return;
 
     const isPointInStage = await checkIsPointInStage(coords);
 
@@ -162,11 +160,13 @@ export default function Geofence() {
     } else {
       alert("No, Point is not verified :(");
     }
-    setCoords(null);
-    // setLat(null);
-    // setLng(null);
+    setCoords({
+      lng: " ",
+      lat: " ",
+    });
   }
 
+  // update or add stages to map, then clear map of layers and sources in unmount(route change)
   useEffect(() => {
     if (!mapRef.current || !stages?.value?.length) return;
 
@@ -217,7 +217,7 @@ export default function Geofence() {
         map.getSource(SOURCE_ID) && map.removeSource(SOURCE_ID);
 
         //Remove previous marker on double click
-        // markerRef.current?.remove();
+        markerRef.current?.remove();
       } catch (error) {
         console.log(error);
       }
