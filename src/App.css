@@ -66,6 +66,10 @@ body {
   cursor: pointer;
 }
 
+.active{
+  background-color: #ccc1c0 !important;
+  color: #f5f5f5 !important;
+}
 .message {
   margin-top: 4rem;
   text-align: center;

@@ -224,24 +224,6 @@ export default function Geofence() {
     };
   }, [stages, mapRef.current]);
 
-  // clean up map
-  // useEffect(() => {
-  //   return () => {
-  //     try {
-  //       const map = mapRef.current;
-  //       if (!map) return;
-
-  //       map.getLayer(LAYER_ID) && map.removeLayer(LAYER_ID);
-  //       map.getSource(SOURCE_ID) && map.removeSource(SOURCE_ID);
-
-  //       //Remove previous marker on double click
-  //       markerRef.current.remove();
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  // }, []);
-
   // if (lat && lng) {
   //   const userSelectedLocation = [lng, lat]; // Assuming selectedLocation is an array with [lon, lat]
   //   console.log("userSelectedLocation", userSelectedLocation);
