@@ -42,21 +42,18 @@ export default function Geofence() {
   const markerRef = useRef(null);
 
   const [selectedFile, setSelectedFile] = useState();
-
   const [stages, setStages] = useState({});
 
   // 1. turn this into one state
   // 2. initialize value = null, it's null or number.
   const [coords, setCoords] = useState({ lng: " ", lat: " " });
-  // const [lng, setLng] = useState(null);
-  // const [lat, setLat] = useState(null);
 
   // 1. use useCallback (because you will need the same function reference when removing the listener)
   // 2. wrap event listener with useEffect
   // 3. add clean up func to useEffect
   // 3.1 move clean up from other useEffect to a better place!
-  const add_marker2 = useCallback((e) => {
-    // function add_marker2(e) {
+  const add_marker = useCallback((e) => {
+    // function add_marker(e) {
     if (markerRef.current) {
       //Remove previous marker on double click
       markerRef.current.remove();
@@ -140,10 +137,10 @@ export default function Geofence() {
 
   // remove Listener
   useEffect(() => {
-    mapRef.current?.on("click", add_marker2);
+    mapRef.current?.on("click", add_marker);
 
     return () => {
-      mapRef.current?.off("click", add_marker2);
+      mapRef.current?.off("click", add_marker);
     };
   }, []);
 

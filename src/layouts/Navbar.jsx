@@ -18,14 +18,6 @@ export default function Navbar() {
       </Link>
       <Link
         className={`navbar-item item-2 ${
-          location.pathname === "/NotFound" ? "active" : ""
-        } `}
-        to={"NotFound"}
-      >
-        404
-      </Link>
-      <Link
-        className={`navbar-item item-3 ${
           location.pathname === "/Geofence" ? "active" : ""
         } `}
         to={"Geofence"}

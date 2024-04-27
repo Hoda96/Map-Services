@@ -3,6 +3,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "../App.css";
 import MapContext from "../context/MapContext";
+import getRoute from "../api/getRoute";
 
 const API_KEY = import.meta.env.VITE_API_KEY;
 const SOURCE_ID = "route-layer";
@@ -68,7 +69,17 @@ export default function FindRoute() {
       return;
     }
 
-    const geometry = await getRoute();
+    // Route API
+    const url = "https://map.ir/routes/foot/v1/driving/";
+    const { startLng, startLat, destinationLng, destinationLat } = coordinates;
+
+    const geometry = await getRoute({
+      url,
+      startLng,
+      startLat,
+      destinationLng,
+      destinationLat,
+    });
 
     console.log("Geometry:", geometry);
 
@@ -107,34 +118,6 @@ export default function FindRoute() {
       });
     }
   }
-
-  const getRoute = async () => {
-    try {
-      const res = await fetch(
-        `https://map.ir/routes/foot/v1/driving/${coordinates.startLng},${coordinates.startLat};${coordinates.destinationLng},${coordinates.destinationLat}?alternatives=true&steps=true&geometries=geojson`,
-        // `https://map.ir/routes/route/v1/driving/51.421047,35.732936;51.422185,35.731821`,
-        // `https://map.ir/routes/route/v1/driving/51.421047,35.732936;51.422185,35.731821?alternatives=true&steps=true&geometries=geojson`,
-        {
-          headers: {
-            "x-api-key": API_KEY,
-          },
-          method: "GET",
-        }
-      );
-
-      if (!res.ok) throw new Error(" Fetch not completed :(");
-
-      const data = await res.json();
-
-      const geometry = data.routes[0].geometry;
-
-      console.log("geometryyyy", geometry);
-      // setGeometry(geometry);
-      return geometry;
-    } catch (error) {
-      return null;
-    }
-  };
 
   useEffect(() => {
     return () => {
