@@ -5,6 +5,7 @@ import "../App.css";
 export default function Navbar() {
   const [isClicked, setIsClicked] = useState(false);
   const location = useLocation();
+
   return (
     <nav className="navbar">
       <Link

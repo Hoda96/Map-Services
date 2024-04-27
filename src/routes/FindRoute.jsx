@@ -5,13 +5,12 @@ import "../App.css";
 import MapContext from "../context/MapContext";
 import getRoute from "../api/getRoute";
 
-const API_KEY = import.meta.env.VITE_API_KEY;
 const SOURCE_ID = "route-layer";
 const LAYER_ID = "route";
 
 export default function FindRoute() {
   const mapRef = useContext(MapContext);
-  // const markerRef = useRef(null);
+  // ? state ??
   const [point, setPoint] = useState({ start: false, destination: false });
   const [coordinates, setCoordinates] = useState({
     startLng: null,
@@ -20,10 +19,12 @@ export default function FindRoute() {
     destinationLat: null,
   });
 
-  const [markers, setMarkers] = useState({
-    start: null,
-    destination: null,
-  });
+  // const [markers, setMarkers] = useState({
+  //   start: null,
+  //   destination: null,
+  // });
+
+  const markers = useRef({ start: null, destination: null });
 
   function handlePoint(type) {
     if (markers[type]) {
@@ -31,27 +32,29 @@ export default function FindRoute() {
       markers[type].remove();
     }
 
-    setPoint((prev) => ({ ...prev, [type]: !prev[type] }));
+    // setPoint((prev) => ({ ...prev, [type]: !prev[type] }));
+    // console.log("points after setState before add marker:", point);
     function add_marker(e) {
-      console.log("e", e);
-      const markerr = new maplibregl.Marker();
-      console.log("e.lngLat", e.lngLat);
+      const marker = new maplibregl.Marker();
       const coords = e.lngLat;
-      markerr.setLngLat(coords).addTo(mapRef.current);
-      // markerRef.current = markerr;
-      // Save the markerr in the state
-      setMarkers((prevState) => ({
-        ...prevState,
-        [type]: markerr,
-      }));
-      console.log("markers:", markers);
+      marker.setLngLat(coords).addTo(mapRef.current);
+      console.log("marker ", marker);
+
+      // Save the marker in the state
+      // setMarkers((prevState) => ({
+      //   ...prevState,
+      //   [type]: marker,
+      // }));
+      // console.log("markers:", markers);
 
       setCoordinates((prevState) => ({
         ...prevState,
         [`${type}Lng`]: coords.lng,
         [`${type}Lat`]: coords.lat,
       }));
-      setPoint((prev) => ({ ...prev, [type]: !prev[type] }));
+
+      // setPoint((prev) => ({ ...prev, [type]: !prev[type] }));
+
       mapRef.current.off("click", add_marker);
     }
     mapRef.current.on("click", add_marker);
@@ -88,6 +91,7 @@ export default function FindRoute() {
       return;
     }
 
+    // Route on map
     const routeSource = mapRef.current?.getSource?.(SOURCE_ID);
     // Check if the route source already exists
     if (routeSource) {
@@ -119,6 +123,7 @@ export default function FindRoute() {
     }
   }
 
+  //Remove Layers, Source and marker in unmount
   useEffect(() => {
     return () => {
       try {
@@ -127,8 +132,7 @@ export default function FindRoute() {
           mapRef.current.removeLayer(LAYER_ID);
         mapRef.current.getSource(SOURCE_ID) &&
           mapRef.current.removeSource(SOURCE_ID);
-
-        // markerRef.current["start"].remove();
+        // markers.current.remove();
       } catch (error) {
         console.log("Error:", error);
       }

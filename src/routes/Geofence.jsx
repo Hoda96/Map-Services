@@ -9,6 +9,8 @@ import MapContext from "../context/MapContext";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
+import checkIsPointInStage from "../api/geofence";
+
 const API_KEY = import.meta.env.VITE_API_KEY;
 
 const SOURCE_ID = "geofence-polygons-source";
@@ -17,25 +19,6 @@ const LAYER_ID = "geofence-polygons-layer";
 const marker = new maplibregl.Marker();
 
 // Check if location is in a stage or not
-const checkIsPointInStage = async (coords) => {
-  const url = `https://map.ir/geofence/boundaries?lat=${coords["lat"]}&lon=${coords["lng"]}`;
-  const options = {
-    method: "GET",
-    headers: {
-      "x-api-key": API_KEY,
-    },
-  };
-
-  try {
-    const response = await fetch(url, options);
-    const data = await response.json();
-    console.log("checkispoin data", data);
-    return data.value.length > 0;
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
-};
 
 export default function Geofence() {
   const mapRef = useContext(MapContext);
@@ -58,12 +41,10 @@ export default function Geofence() {
       //Remove previous marker on double click
       markerRef.current.remove();
     }
-    console.log("e.lngLat", e.lngLat);
     const coordinates = e.lngLat;
     marker.setLngLat(coordinates).addTo(mapRef.current);
     markerRef.current = marker;
     setCoords(coordinates);
-    console.log("coords", coords);
   }, []);
 
   const handleFileChange = (event) => {
@@ -148,7 +129,7 @@ export default function Geofence() {
   async function handlePointSubmit() {
     if (!coords.lat || !coords.lng) return;
 
-    const isPointInStage = await checkIsPointInStage(coords);
+    const isPointInStage = await checkIsPointInStage({ coords });
 
     marker.setLngLat(coords).addTo(mapRef.current);
 
