@@ -88,6 +88,14 @@ export default function Geofence() {
     // Read the file's content
     reader.readAsText(selectedFile);
   };
+  // const handleChange = (e) => {
+  //   setCoords((prev) => ({
+  //     ...prev,
+  //     lng: e.target.value,
+  //   }));
+  //   const coordinates = e.lngLat;
+  //   marker.setLngLat(coordinates).addTo(mapRef.current);
+  // };
 
   // Select point directly on map, not fields in sidebar
   useEffect(() => {
@@ -234,12 +242,14 @@ export default function Geofence() {
               name="lat"
               id="latInput"
               value={coords["lat"]}
-              onChange={(e) =>
+              onChange={(e) => {
                 setCoords((prev) => ({
                   ...prev,
                   lat: e.target.value,
-                }))
-              }
+                }));
+                // const coordinates = e.lngLat;
+                marker.setLngLat(coords).addTo(mapRef.current);
+              }}
             />
           </div>
           <div className="uploadBtn">
@@ -249,12 +259,14 @@ export default function Geofence() {
               name="lng"
               id="lngInput"
               value={coords["lng"]}
-              onChange={(e) =>
+              onChange={(e) => {
                 setCoords((prev) => ({
                   ...prev,
                   lng: e.target.value,
-                }))
-              }
+                }));
+                // const coordinates = e.lngLat;
+                marker.setLngLat(coords).addTo(mapRef.current);
+              }}
             />
           </div>
           <button className="btn" onClick={handlePointSubmit}>
