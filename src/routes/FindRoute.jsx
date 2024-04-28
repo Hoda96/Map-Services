@@ -8,6 +8,11 @@ import getRoute from "../api/getRoute";
 const SOURCE_ID = "route-layer";
 const LAYER_ID = "route";
 
+const markers = {
+  start: new maplibregl.Marker(),
+  destination: new maplibregl.Marker(),
+};
+
 export default function FindRoute() {
   const mapRef = useContext(MapContext);
   // ? state ??
@@ -19,33 +24,16 @@ export default function FindRoute() {
     destinationLat: null,
   });
 
-  // const [markers, setMarkers] = useState({
-  //   start: null,
-  //   destination: null,
-  // });
-
-  const markers = useRef({ start: null, destination: null });
-
   function handlePoint(type) {
-    if (markers[type]) {
-      console.log("type", type);
-      markers[type].remove();
-    }
+    const m = markers[type];
 
-    // setPoint((prev) => ({ ...prev, [type]: !prev[type] }));
+    m.remove();
+
+    setPoint((prev) => ({ ...prev, [type]: !prev[type] }));
     // console.log("points after setState before add marker:", point);
     function add_marker(e) {
-      const marker = new maplibregl.Marker();
       const coords = e.lngLat;
-      marker.setLngLat(coords).addTo(mapRef.current);
-      console.log("marker ", marker);
-
-      // Save the marker in the state
-      // setMarkers((prevState) => ({
-      //   ...prevState,
-      //   [type]: marker,
-      // }));
-      // console.log("markers:", markers);
+      m.setLngLat(coords).addTo(mapRef.current);
 
       setCoordinates((prevState) => ({
         ...prevState,
@@ -53,12 +41,21 @@ export default function FindRoute() {
         [`${type}Lat`]: coords.lat,
       }));
 
-      // setPoint((prev) => ({ ...prev, [type]: !prev[type] }));
+      setPoint((prev) => ({ ...prev, [type]: !prev[type] }));
 
       mapRef.current.off("click", add_marker);
     }
     mapRef.current.on("click", add_marker);
   }
+
+  // remove Listener
+  // useEffect(() => {
+  //   mapRef.current?.on("click", add_marker);
+
+  //   return () => {
+  //     mapRef.current?.off("click", add_marker);
+  //   };
+  // }, []);
 
   async function handleFindRoute() {
     const allCoordsAreNotSet =
@@ -85,6 +82,8 @@ export default function FindRoute() {
     });
 
     console.log("Geometry:", geometry);
+
+    // const isNotOnFindRoutePage = ...
 
     if (!geometry) {
       console.log("Geometry is null");
@@ -127,12 +126,22 @@ export default function FindRoute() {
   useEffect(() => {
     return () => {
       try {
-        if (!mapRef.current) return;
-        mapRef.current.getLayer(LAYER_ID) &&
-          mapRef.current.removeLayer(LAYER_ID);
-        mapRef.current.getSource(SOURCE_ID) &&
-          mapRef.current.removeSource(SOURCE_ID);
-        // markers.current.remove();
+        if (mapRef.current) {
+          mapRef.current.getLayer(LAYER_ID) &&
+            mapRef.current.removeLayer(LAYER_ID);
+
+          mapRef.current.getSource(SOURCE_ID) &&
+            mapRef.current.removeSource(SOURCE_ID);
+
+          // D.R.Y: don't repeat yourself (but it's ok if you do it like 2-3 times)
+          markers["start"].remove();
+          markers["destination"].remove();
+
+          // Javgir nasho (D.R.Y)
+          // Object.entries(markers).map(([_, marker]) => {
+          //   marker.remove();
+          // });
+        }
       } catch (error) {
         console.log("Error:", error);
       }

@@ -19,8 +19,6 @@ const getRoute = async ({url,startLng,startLat,destinationLng, destinationLat}) 
 
     const geometry = data.routes[0].geometry;
 
-    console.log("geometryyyy", geometry);
-    // setGeometry(geometry);
     return geometry;
   } catch (error) {
     return null;

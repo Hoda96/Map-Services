@@ -13,7 +13,7 @@ const checkIsPointInStage = async ({coords}) => {
     try {
       const response = await fetch(url, options);
       const data = await response.json();
-      console.log("checkispoin data", data);
+      console.log("check is point data", data);
       return data.value.length > 0;
     } catch (error) {
       console.error(error);

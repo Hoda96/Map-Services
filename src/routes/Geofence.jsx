@@ -18,8 +18,6 @@ const LAYER_ID = "geofence-polygons-layer";
 
 const marker = new maplibregl.Marker();
 
-// Check if location is in a stage or not
-
 export default function Geofence() {
   const mapRef = useContext(MapContext);
   const markerRef = useRef(null);
@@ -116,7 +114,7 @@ export default function Geofence() {
     fetchStages();
   }, []);
 
-  // remove Listener
+  // add/remove Listener
   useEffect(() => {
     mapRef.current?.on("click", add_marker);
 
@@ -125,7 +123,7 @@ export default function Geofence() {
     };
   }, []);
 
-  // add marler to map after click on submit button
+  // add marker to map after click on submit button
   async function handlePointSubmit() {
     if (!coords.lat || !coords.lng) return;
 
@@ -201,18 +199,6 @@ export default function Geofence() {
       }
     };
   }, [stages, mapRef.current]);
-
-  // if (lat && lng) {
-  //   const userSelectedLocation = [lng, lat]; // Assuming selectedLocation is an array with [lon, lat]
-  //   console.log("userSelectedLocation", userSelectedLocation);
-  //   const url = new URL(
-  //     "https://map.ir/geofence/boundaries",
-  //     window.location.origin
-  //   );
-  //   console.log("url", url);
-  //   url.searchParams.append("lat", userSelectedLocation[1]); // Latitude goes first
-  //   url.searchParams.append("lon", userSelectedLocation[0]); // Longitude follows
-  // }
 
   return (
     <div className="container">
