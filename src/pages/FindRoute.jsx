@@ -4,6 +4,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "../App.css";
 import MapContext from "../context/MapContext";
 import getRoute from "../api/getRoute";
+import cleanup from "../utils/cleanup";
 
 const SOURCE_ID = "route-layer";
 const LAYER_ID = "route";
@@ -15,7 +16,6 @@ const markers = {
 
 export default function FindRoute() {
   const mapRef = useContext(MapContext);
-  // ? state ??
   const [point, setPoint] = useState({ start: false, destination: false });
   const [coordinates, setCoordinates] = useState({
     startLng: null,
@@ -47,15 +47,6 @@ export default function FindRoute() {
     }
     mapRef.current.on("click", add_marker);
   }
-
-  // remove Listener
-  // useEffect(() => {
-  //   mapRef.current?.on("click", add_marker);
-
-  //   return () => {
-  //     mapRef.current?.off("click", add_marker);
-  //   };
-  // }, []);
 
   async function handleFindRoute() {
     const allCoordsAreNotSet =
@@ -125,27 +116,32 @@ export default function FindRoute() {
   //Remove Layers, Source and marker in unmount
   useEffect(() => {
     return () => {
-      try {
-        if (mapRef.current) {
-          mapRef.current.getLayer(LAYER_ID) &&
-            mapRef.current.removeLayer(LAYER_ID);
-
-          mapRef.current.getSource(SOURCE_ID) &&
-            mapRef.current.removeSource(SOURCE_ID);
-
-          // D.R.Y: don't repeat yourself (but it's ok if you do it like 2-3 times)
-          markers["start"].remove();
-          markers["destination"].remove();
-
-          // Javgir nasho (D.R.Y)
-          // Object.entries(markers).map(([_, marker]) => {
-          //   marker.remove();
-          // });
-        }
-      } catch (error) {
-        console.log("Error:", error);
-      }
+      cleanup(mapRef.current, SOURCE_ID, LAYER_ID, markers);
     };
+    // return () => {
+    //   try {
+    //     if (!mapRef.current) return;
+    //     // {
+    //     mapRef.current.getLayer(LAYER_ID) &&
+    //       mapRef.current.removeLayer(LAYER_ID);
+
+    //     mapRef.current.getSource(SOURCE_ID) &&
+    //       mapRef.current.removeSource(SOURCE_ID);
+
+    //     // D.R.Y: don't repeat yourself (but it's ok if you do it like 2-3 times)
+    //     console.log("marker length:", Object.keys(markers).length);
+    //     markers["start"].remove();
+    //     markers["destination"].remove();
+
+    //     // Javgir nasho (D.R.Y)
+    //     // Object.entries(markers).map(([_, marker]) => {
+    //     //   marker.remove();
+    //     // });
+    //     // }
+    //   } catch (error) {
+    //     console.log("Error:", error);
+    //   }
+    // };
   }, []);
 
   return (

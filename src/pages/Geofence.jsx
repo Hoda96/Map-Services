@@ -10,6 +10,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import checkIsPointInStage from "../api/geofence";
+import cleanup from "../utils/cleanup";
 
 const API_KEY = import.meta.env.VITE_API_KEY;
 
@@ -20,7 +21,7 @@ const marker = new maplibregl.Marker();
 
 export default function Geofence() {
   const mapRef = useContext(MapContext);
-  const markerRef = useRef(null);
+  // const markerRef = useRef(null);
 
   const [selectedFile, setSelectedFile] = useState();
   const [stages, setStages] = useState({});
@@ -35,13 +36,13 @@ export default function Geofence() {
   // 3.1 move clean up from other useEffect to a better place!
   const add_marker = useCallback((e) => {
     // function add_marker(e) {
-    if (markerRef.current) {
-      //Remove previous marker on double click
-      markerRef.current.remove();
-    }
+    // if (marker) {
+    //   //Remove previous marker on double click
+    //   marker.remove();
+    // }
     const coordinates = e.lngLat;
     marker.setLngLat(coordinates).addTo(mapRef.current);
-    markerRef.current = marker;
+    // markerRef.current = marker;
     setCoords(coordinates);
   }, []);
 
@@ -191,21 +192,27 @@ export default function Geofence() {
         },
       });
     }
-    // clean up map
     return () => {
-      try {
-        const map = mapRef.current;
-        if (!map) return;
-
-        map.getLayer(LAYER_ID) && map.removeLayer(LAYER_ID);
-        map.getSource(SOURCE_ID) && map.removeSource(SOURCE_ID);
-
-        //Remove previous marker on double click
-        markerRef.current?.remove();
-      } catch (error) {
-        console.log(error);
-      }
+      cleanup(mapRef.current, SOURCE_ID, LAYER_ID, marker);
     };
+    // clean up map
+    // return () => {
+    //   try {
+    //     if (!mapRef.current) return;
+
+    //     mapRef.current.getLayer(LAYER_ID) &&
+    //       mapRef.current.removeLayer(LAYER_ID);
+    //     mapRef.current.getSource(SOURCE_ID) &&
+    //       mapRef.current.removeSource(SOURCE_ID);
+
+    //     //Remove previous marker on double click
+    //     // markerRef.current?.remove();
+    //     console.log("marker length:", Object.keys(marker));
+    //     marker?.remove();
+    //   } catch (error) {
+    //     console.log("Error:", error);
+    //   }
+    // };
   }, [stages, mapRef.current]);
 
   return (
@@ -247,7 +254,6 @@ export default function Geofence() {
                   ...prev,
                   lat: e.target.value,
                 }));
-                // const coordinates = e.lngLat;
                 marker.setLngLat(coords).addTo(mapRef.current);
               }}
             />
@@ -264,7 +270,6 @@ export default function Geofence() {
                   ...prev,
                   lng: e.target.value,
                 }));
-                // const coordinates = e.lngLat;
                 marker.setLngLat(coords).addTo(mapRef.current);
               }}
             />
@@ -272,7 +277,6 @@ export default function Geofence() {
           <button className="btn" onClick={handlePointSubmit}>
             Verify Point
           </button>
-          {/* </form> */}
         </div>
       </div>
     </div>
