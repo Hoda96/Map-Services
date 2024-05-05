@@ -113,12 +113,12 @@ export default function FindRoute() {
     }
   }
 
-  //Remove Layers, Source and marker in unmount
+  //cleanup map: Remove Layers, Source and marker in unmount
   useEffect(() => {
     return () => {
       cleanup(mapRef.current, SOURCE_ID, LAYER_ID, markers);
     };
-    // return () => {
+
     //   try {
     //     if (!mapRef.current) return;
     //     // {

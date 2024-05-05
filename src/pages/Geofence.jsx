@@ -21,8 +21,6 @@ const marker = new maplibregl.Marker();
 
 export default function Geofence() {
   const mapRef = useContext(MapContext);
-  // const markerRef = useRef(null);
-
   const [selectedFile, setSelectedFile] = useState();
   const [stages, setStages] = useState({});
 
@@ -35,11 +33,6 @@ export default function Geofence() {
   // 3. add clean up func to useEffect
   // 3.1 move clean up from other useEffect to a better place!
   const add_marker = useCallback((e) => {
-    // function add_marker(e) {
-    // if (marker) {
-    //   //Remove previous marker on double click
-    //   marker.remove();
-    // }
     const coordinates = e.lngLat;
     marker.setLngLat(coordinates).addTo(mapRef.current);
     // markerRef.current = marker;
@@ -89,14 +82,6 @@ export default function Geofence() {
     // Read the file's content
     reader.readAsText(selectedFile);
   };
-  // const handleChange = (e) => {
-  //   setCoords((prev) => ({
-  //     ...prev,
-  //     lng: e.target.value,
-  //   }));
-  //   const coordinates = e.lngLat;
-  //   marker.setLngLat(coordinates).addTo(mapRef.current);
-  // };
 
   // Select point directly on map, not fields in sidebar
   useEffect(() => {
@@ -192,11 +177,11 @@ export default function Geofence() {
         },
       });
     }
+    // clean up map
     return () => {
       cleanup(mapRef.current, SOURCE_ID, LAYER_ID, marker);
     };
-    // clean up map
-    // return () => {
+
     //   try {
     //     if (!mapRef.current) return;
 
