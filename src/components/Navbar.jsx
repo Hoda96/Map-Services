@@ -6,19 +6,26 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <NavLink
-        activeClassName="active"
+        activeclassname="active"
         className={"navbar-item item-2"}
         to={"Geofence"}
       >
         Geofence
       </NavLink>{" "}
       <NavLink
-        activeClassName="active"
+        activeclassname="active"
         className={"navbar-item item-1 "}
         to={"FindRoute"}
       >
         find Route
       </NavLink>
+      <NavLink
+        activeclassname="active"
+        className={"navbar-item item-3 "}
+        to={"Autosearch"}
+      >
+        Search
+      </NavLink>{" "}
     </nav>
   );
 }

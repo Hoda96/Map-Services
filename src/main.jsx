@@ -8,6 +8,7 @@ import Root from "./pages/Root";
 import FindRoute from "./pages/FindRoute";
 import NotFound from "./pages/NotFound";
 import Geofence from "./pages/Geofence";
+import AutoSearch from "./pages/AutoSearch";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -15,13 +16,18 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
     children: [
       {
-        path: "/FindRoute",
+        path: "/findRoute",
         element: <FindRoute />,
         errorElement: <NotFound />,
       },
       {
-        path: "/Geofence",
+        path: "/geofence",
         element: <Geofence />,
+        errorElement: <NotFound />,
+      },
+      {
+        path: "/autoSearch",
+        element: <AutoSearch />,
         errorElement: <NotFound />,
       },
     ],

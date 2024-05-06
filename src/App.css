@@ -12,6 +12,7 @@ body {
   padding: 0;
   margin: 0;
 }
+
 .container {
   display: flex;
   flex-direction: row;
@@ -56,6 +57,7 @@ body {
   background-color: #f1f1f1;
   border-radius: 1rem;
   box-shadow: none;
+  display: block;
 }
 .findBtn {
   font-size: 1rem;
@@ -182,9 +184,10 @@ font-weight: 500;
 }
 .uploadBtn{
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: start;
+  gap: 0.5rem;
 margin: 1rem 0;
 }
 input[type="file"]{
@@ -194,6 +197,7 @@ input#file-upload-button{
   padding: 20px;
 }
 .divider{
+  width: 250px;
   border: 1px solid #f2f2f2;
   opacity: 0.3;
   margin: 2rem 0 1.5rem 0;
@@ -202,6 +206,17 @@ input#file-upload-button{
   padding: 0.5rem;
   border: none;
   box-shadow: none;
-  border-radius: 16px;
+  border-radius: 1rem;
 
+}
+input[type="text"]{
+box-shadow: 0;
+border: 0px;
+padding: 0.5rem 1.5rem;
+border-radius:1rem ;
+}
+
+
+.search-submit{
+  margin: 0.5rem 0;
 }

@@ -222,7 +222,13 @@ export default function Geofence() {
         </div>
         <div className="divider"></div>
         <div className="addCoords">
-          <p style={{ lineHeight: "1.5rem", marginBottom: "2rem" }}>
+          <p
+            style={{
+              lineHeight: "1.5rem",
+              marginBottom: "2rem",
+              textAlign: "left",
+            }}
+          >
             Select a point on the map or insert the coordinates to Verify its
             Location.
           </p>
