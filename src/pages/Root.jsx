@@ -2,8 +2,8 @@ import maplibregl from "maplibre-gl";
 import React, { useRef } from "react";
 import { Outlet } from "react-router-dom";
 import MapContext from "../context/MapContext";
-import MapComponent from "../layouts/MapComponent";
-import Navbar from "../layouts/Navbar";
+import MapComponent from "../components/MapComponent";
+import Navbar from "../components/Navbar";
 
 import "maplibre-gl/dist/maplibre-gl.css";
 
